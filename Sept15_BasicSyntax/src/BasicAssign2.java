@@ -6,7 +6,7 @@ public class BasicAssign2 {
         String lineIn = stdin.nextLine().toUpperCase();
         String lineOut = "";
         int countB = 1, countW = 1;
-        while (lineIn.replaceAll("B", "").replaceAll("W", "").length() != 0) {
+        while (!lineIn.replaceAll("B", "").replaceAll("W", "").isEmpty()) {
             System.out.println("Invalid Input: Try Again");
             lineIn = stdin.nextLine().toUpperCase();
         }
