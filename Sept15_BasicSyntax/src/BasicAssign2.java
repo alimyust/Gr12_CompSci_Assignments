@@ -34,7 +34,7 @@ public class BasicAssign2 {
                 }
             }
         }
-        if(lineOut.length() == 0){ // Edge case if only 1 character (loop doesn't run)
+        if(lineOut.isEmpty()){ // Edge case if only 1 character (loop doesn't run)
             if(lineIn.charAt(0) == 'W')
                 lineOut += 1 + "W";
             if(lineIn.charAt(0) == 'B')

@@ -38,7 +38,7 @@ public class BasicAssign5 {
         // hard coded product calculation (only ever 6 values)
         if ((prod != Integer.parseInt(lineInP2)))
             System.out.println("Not a valid product code");
-        else
+        else // print output
             System.out.println("A valid product code");
 
     }
