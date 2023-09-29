@@ -15,11 +15,20 @@ public class Main {
                         {12, 9, 20, 42, 9, 19, 26, 22},
                         {30, 17, 17, 35, 14, 25, 14, 21},
                         {15, 21, 37, 24, 19, 15, 35, 15}};
+        int[][] sumGrid = {{0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0}};
         navigate(grid);
 
 //        System.out.println(Arrays.toString(arrayAdd(arr, 5)));
 //        System.out.println(Arrays.toString(fold(arr)));
 //        System.out.println(licensePlate(badWords));
+//        System.out.println(dpNav(grid, sumGrid, 7, 7));
     }
 
     static double mean(int[] arrIn) {
@@ -68,35 +77,60 @@ public class Main {
     }
 
     static void navigate(int[][] grid) {
-        System.out.println(navigate(grid, 0, 0, grid[0][0], ""));
-
+        navigate(grid, 0, 0, grid[0][0], "");
     }
 
-    static int navigate(int[][] grid, int currX, int currY, int timeSum, String seq) {
-
+    static void navigate(int[][] grid, int currX, int currY, int timeSum, String seq) {
+        if (currX == 7 && currY == 7) {
 //            System.out.println(timeSum);
 //            System.out.println(seq);
-//            if (timeSum < Main.bestTime) {
-//                Main.bestTime = timeSum;
-//                Main.code = seq;
-//            }
-        // Reaches the last path
-        if (currX != 7 && currY != 7) {
-            if (currX == 7) {
-                navigate(grid, currX, currY + 1, timeSum + grid[currX][currY + 1], seq + 'D');
-            } else if (currY == 7)
-                navigate(grid, currX + 1, currY, timeSum + grid[currX + 1][currY], seq + 'R');
-            else {
-                navigate(grid, currX, currY + 1, timeSum + grid[currX][currY + 1], seq + 'D');
-                navigate(grid, currX + 1, currY, timeSum + grid[currX + 1][currY], seq + 'R');
+            // Reaches the last path
+            if (timeSum < Main.bestTime) {
+                Main.bestTime = timeSum;
+                Main.code = seq;
             }
+            if (seq.equals("RRRRRRRDDDDDDD"))
+                System.out.println(Main.bestTime + "\n" + Main.code);
+            return;
         }
-        if (seq.equals("RRRRRRRDDDDDDD"))
-            System.out.println(Main.bestTime + "\n" + Main.code);
-        return timeSum;
-
+        if (currX == 7) {
+            navigate(grid, currX, currY + 1, timeSum + grid[currX][currY + 1], seq + 'D');
+        } else if (currY == 7)
+            navigate(grid, currX + 1, currY, timeSum + grid[currX + 1][currY], seq + 'R');
+        else {
+            navigate(grid, currX, currY + 1, timeSum + grid[currX][currY + 1], seq + 'D');
+            navigate(grid, currX + 1, currY, timeSum + grid[currX + 1][currY], seq + 'R');
+        }
     }
-}
+
+//    static int [][]dpNav(int[][] grid, int[][][] sumGrid, int currX, int currY, int seq) {
+//        System.out.println(currX + "," + currY);
+//        if(currX ==0 && currY == 0)
+//            sumGrid[currX][currY] = new int[]{grid[currX][currY], seq};
+//        else if (currX <= 0)
+//            sumGrid[currX][currY] = new int[]{grid[0][currY] + dpNav(grid, sumGrid, 0, currY - 1, seq)};
+//        else if (currY <= 0)
+//            sumGrid[currX][currY] = new int[]{grid[currX][0] + dpNav(grid, sumGrid, currX - 1, 0, seq)};
+//        else
+//            sumGrid[currX][currY] = new int[]{grid[currX][currY] + Math.min(dpNav(grid, sumGrid, currX - 1, currY, seq), dpNav(grid, sumGrid, currX, currY - 1, seq))};
+//        return sumGrid[currX][currY];
+//    }
+////        sumGrid[currY][currX] = grid[currY][currX] + Math.min(sumGrid[currY][currX-1], sumGrid[currY-1][currX]);
+
+
+//    static int[] dpNav(int[][] grid, int[][] sumGrid, int currX, int currY, int seq) {
+////        System.out.println(currX + "," + currY);
+//        if(currX ==0 && currY == 0)
+//            return new int[]{grid[0][0], 2};
+//        if (currX <= 0)
+//            return new int[]{grid[0][currY] + dpNav(grid, sumGrid, 0, currY - 1, seq)[0], 2};
+//        if (currY <= 0)
+//            return new int[]{grid[currX][0] + dpNav(grid, sumGrid, currX - 1, 0, 1)[0], 2};
+//        return new int[]{grid[currX][currY] + Math.min(dpNav(grid, sumGrid, currX - 1, currY, 1)[0], dpNav(grid, sumGrid, currX, currY - 1, 1)[0]),2};
+//    }
+////        sumGrid[currY][currX] = grid[currY][currX] + Math.min(sumGrid[currY][currX-1], sumGrid[currY-1][currX]);
+
+
 //    static void navigate(int [][] grid, int currX, int currY, int timeSum, String seq){
 //        if(currX == 7 && currY == 7 ){
 //            if (timeSum < Main.bestTime) {
@@ -116,4 +150,29 @@ public class Main {
 //        }
 //
 //    }
-//}
+
+
+//    static int dpNav(int[][] grid, int[][] sumGrid, int currX, int currY) {
+////        System.out.println(currX + "," + currY);
+//        if(currX ==0 && currY == 0)
+//            return grid[0][0];
+//        if (currX <= 0)
+//            return grid[0][currY] + dpNav(grid, sumGrid, 0, currY - 1);
+//        else if (currY <= 0)
+//            return grid[currX][0] + dpNav(grid, sumGrid, currX - 1, 0);
+//        else
+//            return grid[currX][currY] + Math.min(dpNav(grid, sumGrid, currX - 1, currY), dpNav(grid, sumGrid, currX, currY - 1));
+//    }
+////        sumGrid[currY][currX] = grid[currY][currX] + Math.min(sumGrid[currY][currX-1], sumGrid[currY-1][currX]);
+
+
+//        if(currX ==0 && currY == 0)
+//                return new int[]{grid[0][0], 2};
+//                if (currX <= 0)
+//                return new int[]{grid[0][currY] + dpNav(grid, sumGrid, 0, currY - 1, 1)[0], 2};
+//                if (currY <= 0)
+//                return new int[]{grid[currX][0] + dpNav(grid, sumGrid, currX - 1, 0, 1)[0], 2};
+//                return new int[]{grid[currX][currY] + Math.min(dpNav(grid, sumGrid, currX - 1, currY, 1)[0], dpNav(grid, sumGrid, currX, currY - 1, 1)[0]),2};
+//                }
+
+}
