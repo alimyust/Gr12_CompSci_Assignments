@@ -17,7 +17,7 @@ public class StudentRecord {
         double avg = 0;
         for (Double j : this.marks)
             avg += j;
-        return avg/this.marks.size();
+        return avg/(double)(this.marks.size());
     }
     public double median(){
 //        int size = marks.size() - 1;
@@ -51,8 +51,18 @@ public class StudentRecord {
         return temp;
     }
 
+    public void addMark(double mark){
+        this.marks.add(mark);
+    }
     public boolean hasImproved (){
-        return false;
+        return (average() < this.marks.get(marks.size()-1));
+    }
+
+    @Override
+    public String toString() {
+        return "StudentRecord: " +
+                "marks=" + marks +
+                ", name='" + name;
     }
 }
 
