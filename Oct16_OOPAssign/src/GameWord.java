@@ -21,13 +21,12 @@ private String contents = "";
         int count = 0;
         for(int i =0; i <small.length(); i++) {
             for (int j = 0; j < large.length(); j++) {
-                if (small.charAt(i) == small.charAt(j)) {
+                if (small.charAt(i) == large.charAt(j)) {
                     count++;
                     break;
                 }
             }
         }
-        System.out.println(count);
         return (count == small.length());
     }
     private String smallerString(String in){
@@ -35,6 +34,7 @@ private String contents = "";
             return in;
         return this.contents;
     }
+
 
 }
 
