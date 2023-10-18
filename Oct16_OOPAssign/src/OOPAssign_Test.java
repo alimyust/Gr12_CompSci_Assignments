@@ -12,7 +12,10 @@ public class OOPAssign_Test {
         System.out.println(s1.average() + ", " + s1.median() + ", " + s1.mode());
 
 
-        GameWord w1 = new GameWord("potato");
+        GameWord w1 = new GameWord("abc");
         System.out.println(w1.anagram("pots"));
+        System.out.println(w1.pointValue());
+        ArrayList<String> temp= new ArrayList<>();
+        System.out.println(w1.permutations("", "abc", temp, 0));
     }
 }
