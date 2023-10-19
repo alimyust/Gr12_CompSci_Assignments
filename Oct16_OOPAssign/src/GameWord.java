@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
 
 public class GameWord {
     private String contents = "";
@@ -19,6 +18,9 @@ public class GameWord {
     public boolean anagram(String otherWord) {
         return (sortString(otherWord).equals(sortString(this.contents)));
     }
+    public boolean anagram(GameWord otherWord) {
+        return (sortString(otherWord.contents).equals(sortString(this.contents)));
+    }
 
     private String sortString(String in) {
         char[] ar = in.toLowerCase().toCharArray();
@@ -33,6 +35,11 @@ public class GameWord {
             total += values[(int) (this.contents.toLowerCase().charAt(i)) - 97];
         return total;
     }
+    public ArrayList<String> permutations(String rem) {
+        ArrayList<String> temp= new ArrayList<>();
+        return permutations("", rem,temp);
+    }
+
 
     public ArrayList<String> permutations(String soFar, String rem, ArrayList<String> perms) {
         if (rem.isEmpty())
@@ -44,5 +51,10 @@ public class GameWord {
             permutations(soFar + curr, before + after, perms);
         }
         return perms;
+    }
+
+    @Override
+    public String toString() {
+        return  "contents='" + contents + '\'';
     }
 }
