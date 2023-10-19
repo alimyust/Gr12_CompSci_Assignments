@@ -41,6 +41,10 @@ public class StudentRecord {
                     break;
                 }
 //        System.out.println(Arrays.toString(tempArr));
+        if(arrMax(tempArr) == arrMin(tempArr)) {
+            return modes;
+        }
+        System.out.println(arrMax(tempArr) + ", "+arrMin(tempArr));
         for (int i = 0; i < tempArr.length; i++)
             if (tempArr[i] == arrMax(tempArr) && tempArr[i] > 0)
                 modes.add(this.marksSorted.get(i));
@@ -53,11 +57,21 @@ public class StudentRecord {
                 temp = j;
         return temp;
     }
+    private int arrMin(int[] arr){
+        int temp = arrMax(arr);
+        for(int j : arr)
+            if( temp > j)
+                temp = j;
+        return temp;
+    }
 
     public void addMark(double mark){
         this.marksUnsorted.add(mark);
         this.marksSorted.add(mark);
         Collections.sort(marksSorted);
+        System.out.println(marksSorted);
+        System.out.println(marksUnsorted);
+
     }
     public boolean hasImproved (){
         return (average() < this.marksUnsorted.get(this.marksUnsorted.size()-1));

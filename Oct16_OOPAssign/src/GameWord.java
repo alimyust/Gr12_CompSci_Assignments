@@ -34,57 +34,15 @@ public class GameWord {
         return total;
     }
 
-    public ArrayList<String> permutations(String soFar, String rem, ArrayList<String> perms, int i) {
-        if(rem.length() == 0) {
+    public ArrayList<String> permutations(String soFar, String rem, ArrayList<String> perms) {
+        if (rem.isEmpty())
             perms.add(soFar);
-            if (perms.size() == factorial(soFar.length()))
-                return perms;
-        }
-        if(i < rem.length()){
+        for (int i = 0; i < rem.length(); i++) {
             String curr = rem.substring(i, i + 1);
-            String before = rem.substring(0, i);//letters before current
-            String after = rem.substring(i + 1);//letters after current
-            return permutations(soFar+curr,before+after, perms, i+1);
+            String before = rem.substring(0, i);
+            String after = rem.substring(i + 1);
+            permutations(soFar + curr, before + after, perms);
         }
-        System.out.println(perms);
-        return permutations(soFar,rem, perms, i+1);
-    }
-    private int factorial(int n) {
-        if(n == 1) // base case
-            return 1;
-        return n*factorial((n-1));
-    }
-    static void anagrams(String soFar,String rem){
-        //if no letters remain, we have a solution
-        if (rem.length()==0){//base case
-            System.out.println(soFar);
-        }
-        //Recurse ONCE for EACH remaining letter in "rem"
-        //adding each to the current string
-        //Pass all letters but the added one into the
-        //recursive call as remaining letters
-        for (int i=0;i<rem.length();i++){
-            String curr=rem.substring(i,i+1);
-            String before=rem.substring(0,i);//letters before current
-            String after=rem.substring(i+1);//letters after current
-            //System.out.println(curr+" "+before+" "+after);
-            anagrams(soFar+curr,before+after);
-        }
+        return perms;
     }
 }
-
-
-// anagram
-//    String small = smallerString(otherWord);
-//    String large = (Objects.equals(small, this.contents))? otherWord: this.contents;
-//    int count = 0;
-//        for(int i =0; i <small.length(); i++) {
-//        for (int j = 0; j < large.length(); j++) {
-//            if (small.charAt(i) == large.charAt(j)) {
-//                count++;
-//                break;
-//            }
-//        }
-//    }
-//        return (count == small.length());
-
