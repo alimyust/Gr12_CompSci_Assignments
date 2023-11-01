@@ -1,18 +1,22 @@
 import javax.swing.*;
 
 public class Asteroids extends JFrame{
-    AsteroidsPanel panel = new AsteroidsPanel();
+     static AsteroidsPanel asteroidsPanel = new AsteroidsPanel();
 
     public Asteroids() {
         super("Asteroids");
-        add(panel);
+        add(asteroidsPanel);
         pack();
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
     }
 
+    public static AsteroidsPanel getAsteroidsPanel() {
+        return asteroidsPanel;
+    }
+
     public static void main(String[] args) {
-        Asteroids frame = new Asteroids();
+        new Asteroids();
     }
 }
