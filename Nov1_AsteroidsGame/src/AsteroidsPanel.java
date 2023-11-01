@@ -1,0 +1,2 @@
+public class AsteroidsPanel {
+}
