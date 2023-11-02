@@ -26,10 +26,10 @@ public class Player {
         this.right = KeyEvent.VK_D;
         this.angle = 0;
     }
-    private double getCos(double angle){
+    public static double getCos(double angle){
         return Math.cos(Math.toRadians(angle));
     }
-    private double getSin(double angle){
+    public static double getSin(double angle){
         return Math.sin(Math.toRadians(angle));
     }
     public void movePlayer(boolean[] keys) {
@@ -47,7 +47,7 @@ public class Player {
             this.vy = (this.vy > 0)?acc*3: - acc*3;
         if (Math.abs(this.vx) > acc*3)//speed limit
             this.vx = (this.vx > 0)?acc*3: - acc*3;
-        System.out.println(vx +" , "+ vy);
+//        System.out.println(vx +" , "+ vy);
         this.x += (int) this.vx;
         this.y += (int) this.vy;
         this.vx += (this.vx > acc/30) ? -acc / 30 : acc / 30;
@@ -72,9 +72,9 @@ public class Player {
 //        g.fillRect(this.x, this.y, 20, 20);
         g.setColor(Color.red);
 
-        g.drawLine(x,y, 20+x+(int) (150*getCos(angle-20)), 20+y+(int) (150*getSin(angle-20)));
-        g.drawLine(x,y,20+x+(int) (150*getCos(angle+20)),20+y+(int) (150*getSin(angle+20)));
-        g.drawLine(20+x+(int) (150*getCos(angle-20)), 20+y+(int) (150*getSin(angle-20)), 20+x+(int) (150*getCos(angle+20)),20+y+(int) (150*getSin(angle+20)));
+        g.drawLine(x,y, 10+x+(int) (50*getCos(angle-10)), 10+y+(int) (50*getSin(angle-10)));
+        g.drawLine(x,y,10+x+(int) (50*getCos(angle+10)),10+y+(int) (50*getSin(angle+10)));
+
         g.setColor(Color.GREEN);
         g.drawLine(this.x, this.y,
                 this.x + (int) (50* getCos(angle)), this.y + (int) (50 * getSin(angle)));

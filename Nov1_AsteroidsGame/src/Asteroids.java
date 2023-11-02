@@ -12,10 +12,6 @@ public class Asteroids extends JFrame{
 
     }
 
-    public static AsteroidsPanel getAsteroidsPanel() {
-        return asteroidsPanel;
-    }
-
     public static void main(String[] args) {
         new Asteroids();
     }

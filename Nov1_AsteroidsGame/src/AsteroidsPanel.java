@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, MouseListener {
     private static final int WIDTH = 800, HEIGHT = 600, DELAY = 10;
@@ -10,11 +11,13 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     private boolean[] keys;
     Timer timer;
     Player p1;
+    ArrayList<Meteoroid> meteors;
 
     public AsteroidsPanel() {
         keys = new boolean[KeyEvent.KEY_LAST + 1];
         timer = new Timer(10, this);//Listens to this panel (makes loop)
         p1 = new Player();
+        meteors = new ArrayList<Meteoroid>();
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setFocusable(true); // turns into loop.
         requestFocus();
@@ -30,15 +33,21 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, WIDTH, HEIGHT);
             p1.draw(g);
+            for(Meteoroid j: meteors)
+                j.drawMeteoroid(g);
 
         }
     }
 
     private void move() {
         p1.movePlayer(keys);
-
+        for(Meteoroid j: meteors)
+            j.moveSpaceObject();
     }
     public void actionPerformed(ActionEvent e) {
+        if(meteors.size() ==0)
+            for(int i=0; i < 3; i++)
+                meteors.add(new Meteoroid(300,400,2));
         move();
         repaint();
     }
