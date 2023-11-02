@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
+//import java.awt.geom.AffineTransform;
 
 public class Player {
     private int x;
@@ -20,32 +21,37 @@ public class Player {
         this.vy = 0;
         this.score = 0;
         this.lives = 3;
-        this.boost = KeyEvent.VK_UP;
-        this.left = KeyEvent.VK_LEFT;
-        this.right = KeyEvent.VK_RIGHT;
+        this.boost = KeyEvent.VK_W;
+        this.left = KeyEvent.VK_A;
+        this.right = KeyEvent.VK_D;
         this.angle = 0;
     }
-
+    private double getCos(double angle){
+        return Math.cos(Math.toRadians(angle));
+    }
+    private double getSin(double angle){
+        return Math.sin(Math.toRadians(angle));
+    }
     public void movePlayer(boolean[] keys) {
-        double acc = 0.1;
+        double acc = 1;
         if (keys[this.boost]) {
-            this.vx += acc * Math.cos(Math.toRadians(this.angle));
-            this.vy += acc * Math.sin(Math.toRadians(this.angle));
+            this.vx -= acc * getCos(angle);
+            this.vy -= acc * getSin(angle);
         }
         if (keys[this.left])
-            this.angle -= 2;
+            this.angle -= 6;
         if (keys[this.right])
-            this.angle += 2;
+            this.angle += 6;
 
-        if (this.vy > 3)
-            this.vy = 3;
-        if (this.vx > 3)
-            this.vx = 3;
-
-        this.x += this.vx;
-        this.y += this.vy;
-//        this.vx += (this.vx > acc/5) ? -acc / 2 : acc / 2;
-//        this.vy += (this.vy > acc/5) ? -acc / 2 : acc / 2;
+        if (Math.abs(this.vy) > acc*3)
+            this.vy = (this.vy > 0)?acc*3: - acc*3;
+        if (Math.abs(this.vx) > acc*3)//speed limit
+            this.vx = (this.vx > 0)?acc*3: - acc*3;
+        System.out.println(vx +" , "+ vy);
+        this.x += (int) this.vx;
+        this.y += (int) this.vy;
+        this.vx += (this.vx > acc/30) ? -acc / 30 : acc / 30;
+        this.vy += (this.vy > acc/30) ? -acc / 30 : acc / 30;
         playerBoundary();
     }
 
@@ -61,11 +67,17 @@ public class Player {
     }
 
     public void draw(Graphics g) {
+
         g.setColor(Color.WHITE);
-        g.fillRect(this.x, this.y, 20, 20);
+//        g.fillRect(this.x, this.y, 20, 20);
+        g.setColor(Color.red);
+
+        g.drawLine(x,y, 20+x+(int) (150*getCos(angle-20)), 20+y+(int) (150*getSin(angle-20)));
+        g.drawLine(x,y,20+x+(int) (150*getCos(angle+20)),20+y+(int) (150*getSin(angle+20)));
+        g.drawLine(20+x+(int) (150*getCos(angle-20)), 20+y+(int) (150*getSin(angle-20)), 20+x+(int) (150*getCos(angle+20)),20+y+(int) (150*getSin(angle+20)));
         g.setColor(Color.GREEN);
         g.drawLine(this.x, this.y,
-                this.x + (int) (this.x * Math.cos(Math.toRadians(angle))), this.y + (int) (this.y * Math.sin(Math.toRadians(angle))));
+                this.x + (int) (50* getCos(angle)), this.y + (int) (50 * getSin(angle)));
     }
 
     public Rectangle getRect() {
