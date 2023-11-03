@@ -72,12 +72,12 @@ public class Player {
 //        g.fillRect(this.x, this.y, 20, 20);
         g.setColor(Color.red);
 
-        g.drawLine(x,y, 10+x+(int) (50*getCos(angle-10)), 10+y+(int) (50*getSin(angle-10)));
-        g.drawLine(x,y,10+x+(int) (50*getCos(angle+10)),10+y+(int) (50*getSin(angle+10)));
+        g.drawLine(this.x - (int) (30* getCos(angle)), this.y - (int) (30 * getSin(angle)), 10+x+(int) (50*getCos(angle-15)), 10+y+(int) (50*getSin(angle-15)));
+        g.drawLine(this.x - (int) (30* getCos(angle)), this.y - (int) (30 * getSin(angle)),10+x+(int) (50*getCos(angle+15)),10+y+(int) (50*getSin(angle+15)));
 
-        g.setColor(Color.GREEN);
-        g.drawLine(this.x, this.y,
-                this.x + (int) (50* getCos(angle)), this.y + (int) (50 * getSin(angle)));
+//        g.setColor(Color.GREEN);
+//        g.drawLine(this.x - (int) (30* getCos(angle)), this.y - (int) (30 * getSin(angle)),
+//                this.x + (int) (50* getCos(angle)), this.y + (int) (50 * getSin(angle)));
     }
 
     public Rectangle getRect() {

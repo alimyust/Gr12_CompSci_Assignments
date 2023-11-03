@@ -9,9 +9,9 @@ public class SpaceObject {
         protected int wid;
 
 
-    public SpaceObject(int x, int y,int wid,int angle) {
-        this(x,y,wid);
-        this.angle = angle;
+    public SpaceObject(int x, int y,double angle) {
+        this(x,y,3);
+        this.angle = (int)(angle);
         this.vx = 2;
         this.vy = 2;
     }
@@ -33,12 +33,12 @@ public class SpaceObject {
         private void spaceObjectBoundary() {
             //Allows object to get out of frame before going to the other side
             if (this.x > AsteroidsPanel.getWIDTH())
-                this.x = wid;
-            if (this.x < wid)
+                this.x = -wid;
+            if (this.x < -wid)
                 this.x = AsteroidsPanel.getWIDTH();
             if (this.y > AsteroidsPanel.getHEIGHT())
-                this.y = wid;
-            if (this.y < wid)
+                this.y = -wid;
+            if (this.y < -wid)
                 this.y = AsteroidsPanel.getHEIGHT();
         }
     }
