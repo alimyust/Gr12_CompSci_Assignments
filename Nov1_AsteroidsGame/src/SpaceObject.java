@@ -1,4 +1,7 @@
+import com.sun.source.tree.DirectiveTree;
+
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 public class SpaceObject {
         protected int x;
@@ -8,7 +11,8 @@ public class SpaceObject {
         private int angle;
         protected int wid;
 
-
+    public SpaceObject() {
+    }
     public SpaceObject(int x, int y,double angle) {
         this(x,y,3);
         this.angle = (int)(angle);
@@ -30,7 +34,7 @@ public class SpaceObject {
             spaceObjectBoundary();
         }
 
-        private void spaceObjectBoundary() {
+        public void spaceObjectBoundary() {
             //Allows object to get out of frame before going to the other side
             if (this.x > AsteroidsPanel.getWIDTH())
                 this.x = -wid;
@@ -40,5 +44,9 @@ public class SpaceObject {
                 this.y = -wid;
             if (this.y < -wid)
                 this.y = AsteroidsPanel.getHEIGHT();
+        }
+
+        public Rectangle spaceObjRect(){
+            return new Rectangle();
         }
     }

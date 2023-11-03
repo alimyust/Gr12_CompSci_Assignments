@@ -1,3 +1,5 @@
+import com.sun.jdi.request.MethodEntryRequest;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -9,17 +11,19 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     int gameState = INTRO;
 
     private boolean[] keys;
-    Timer timer;
+    static Timer timer;
     Player p1;
     ArrayList<Meteoroid> meteors;
+    public static ArrayList<Bullet> bullets;
 
     public AsteroidsPanel() {
         keys = new boolean[KeyEvent.KEY_LAST + 1];
         timer = new Timer(10, this);//Listens to this panel (makes loop)
         p1 = new Player();
         meteors = new ArrayList<Meteoroid>();
+        bullets = new ArrayList<Bullet>();
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        setFocusable(true); // turns into loop.
+        setFocusable(true);
         requestFocus();
         addKeyListener(this);
         addMouseListener(this);
@@ -35,7 +39,8 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
             p1.draw(g);
             for(Meteoroid j: meteors)
                 j.drawMeteoroid(g);
-
+            for(Bullet j: bullets)
+                j.drawBullet(g);
         }
     }
 
@@ -43,11 +48,20 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         p1.movePlayer(keys);
         for(Meteoroid j: meteors)
             j.moveSpaceObject();
+        for(Bullet j: bullets)
+            j.moveSpaceObject();
     }
-    public void actionPerformed(ActionEvent e) {
+    public void collision(){
         if(meteors.size() ==0)
             for(int i=0; i < 3; i++)
                 meteors.add(new Meteoroid(300,400,2));
+//        for(Meteoroid j: meteors){
+//            if()
+
+//        }
+    }
+    public void actionPerformed(ActionEvent e) {
+        collision();
         move();
         repaint();
     }
