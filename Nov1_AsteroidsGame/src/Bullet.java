@@ -1,10 +1,18 @@
 import java.awt.*;
 
 public class Bullet extends SpaceObject{
-    public Bullet(int x, int y, int wid) {
-        super(x, y, wid);
+    private int bullDecay;
+    public Bullet(int x, int y, double angle) {
+        super(x, y, angle);
+        bullDecay = 30;
+        //Bullets range before despawning
     }
     public void drawBullet(Graphics g){
+        bullDecay--;
         g.drawOval(this.x,this.y,this.wid,this.wid);
+    }
+
+    public int getBullDecay() {
+        return bullDecay;
     }
 }
