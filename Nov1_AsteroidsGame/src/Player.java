@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 //import java.awt.geom.AffineTransform;
 
 public class Player extends SpaceObject{
@@ -18,10 +19,10 @@ public class Player extends SpaceObject{
     private final int legD ;
     private final int legLength ;
     private int bullCounter;
-//    public Player(int x, int y, double angle) {
+    //    public Player(int x, int y, double angle) {
 //        super(x, y, angle);
 //    }
-
+    private double[][] DEFAULT_SHIP;
 
     public Player() {
         super();
@@ -40,19 +41,15 @@ public class Player extends SpaceObject{
         this.legD = 10;
         this.legLength=30;
         this.bullCounter = 40;
-    }
-    public static double getCos(double angle){
-        return Math.cos(Math.toRadians(angle));
-    }
-    public static double getSin(double angle){
-        return Math.sin(Math.toRadians(angle));
+        DEFAULT_SHIP = new double[][]{{-30,30,30}, {0,-15,15}};
     }
     public void movePlayer(boolean[] keys) {
         double acc = 1;
         bullCounter--;
         if(keys[KeyEvent.VK_SPACE] && bullCounter < 0) {
-            AsteroidsPanel.bullets.add(new Bullet(this.x - (int) (legLength* getCos(angle)), this.y - (int) (legLength * getSin(angle)), angle));
-            bullCounter = 60;
+            AsteroidsPanel.bullets.add(new Bullet(this.x - (int) (legLength* getCos(angle)),
+                    this.y - (int) (legLength * getSin(angle)), angle));
+            bullCounter = 3;
         }
         if (keys[this.boost]) {
             this.vx -= acc * getCos(angle);
@@ -89,22 +86,27 @@ public class Player extends SpaceObject{
     }
 
     public void draw(Graphics g) {
+        int[][] rotatedPoints = rotatePoints(DEFAULT_SHIP, this.angle,this.x,this.y);
+        g.setColor(Color.BLUE);
+        g.drawPolygon(rotatedPoints[0],rotatedPoints[1],3);
+    }
+}
 
-        g.setColor(Color.WHITE);
-//        g.fillRect(this.x, this.y, 20, 20);
-        g.setColor(Color.red);
-        g.drawLine(this.x - (int) (legLength* getCos(angle)), this.y - (int) (legLength * getSin(angle)),
-                legD+x+(int) (legLength*getCos(angle-legDist)), legD+y+(int) (legLength*getSin(angle-legDist)));
-        g.drawLine(this.x - (int) (legLength* getCos(angle)), this.y - (int) (legLength * getSin(angle)),
-                legD+x+(int) (legLength*getCos(angle+legDist)),legD+y+(int) (legLength*getSin(angle+legDist)));
 
-//        g.drawLine(legD+x+(int) (legLength*getCos(angle+legDist)),legD+y+(int) (legLength*getSin(angle+legDist)), (int) (x+50*getCos(angle)), (int) (y+50*getSin(angle)));
-//        g.drawLine(legD+x+(int) (legLength*getCos(angle-legDist)), legD+y+(int) (legLength*getSin(angle-legDist)),(int) (x+50*getCos(angle)), (int) (y+50*getSin(angle)));
-        g.setColor(Color.GREEN);
-        g.drawLine(x,y,this.x - (int) (legLength* getCos(angle)), this.y - (int) (legLength * getSin(angle)));
-      g.drawRect(x-wid/2,y-wid/2,wid,wid);
+
+
+//        g.drawLine(x,y,this.x - (int) (legLength* getCos(angle)), this.y - (int) (legLength * getSin(angle)));
+//        g.drawRect(x-wid/2,y-wid/2,wid,wid);
 //        g.setColor(Color.GREEN);
 //        g.drawLine(this.x - (int) (30* getCos(angle)), this.y - (int) (30 * getSin(angle)),
 //                this.x + (int) (50* getCos(angle)), this.y + (int) (50 * getSin(angle)));
-    }
-}
+
+
+
+//        g.drawLine((int) (x-outer*getCos(angle)), (int) (y-outer*getSin(angle)),
+//                (int) (x+outer*getCos(angle+legSpread)), (int) (y+outer*getSin(angle+legSpread)));
+//
+//                g.drawLine((int) (x-outer*getCos(angle)), (int) (y-outer*getSin(angle)),
+//                (int) (x+outer*getCos(angle-legSpread)), (int) (y+outer*getSin(angle-legSpread)));
+////        g.setColor(Color.GREEN);
+//        g.drawLine(x,y, (int) (x-outer*getCos(angle)), (int) (y-outer*getSin(angle)));

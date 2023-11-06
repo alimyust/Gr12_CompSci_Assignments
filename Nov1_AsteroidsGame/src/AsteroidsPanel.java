@@ -1,15 +1,16 @@
-import com.sun.jdi.request.MethodEntryRequest;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, MouseListener {
     private static final int WIDTH = 800, HEIGHT = 600, DELAY = 10;
     private static final int INTRO = 0, GAME = 1;
     int gameState = INTRO;
 
+    private int lvl; //amount of meteors
     private boolean[] keys;
     static Timer timer;
     Player p1;
@@ -22,6 +23,7 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         p1 = new Player();
         meteors = new ArrayList<Meteoroid>();
         bullets = new ArrayList<Bullet>();
+        lvl = 3;
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setFocusable(true);
         requestFocus();
@@ -52,14 +54,46 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
             j.moveSpaceObject();
     }
     public void collision(){
-        if(meteors.size() ==0)
-            for(int i=0; i < 3; i++)
-                meteors.add(new Meteoroid(300,400,2));
-//        for(Meteoroid j: meteors){
-//            if()
+        final AtomicBoolean[] mAdd = {new AtomicBoolean(false)};
+        final int[][] m1 = new int[1][1];
+        if(meteors.isEmpty()) {
+            lvl ++;
+            for (int i = 0; i < lvl; i++) {
+                int xMeteorRange = (int) ((Math.random()>0.5)?Math.random()*(p1.getX()-200):
+                        p1.getX()+200+Math.random()*WIDTH);
+                int yMeteorRange = (int) ((Math.random()>0.5)?Math.random()*(p1.getY()-200):
+                        p1.getY()+200+Math.random()*WIDTH);
+                meteors.add(new Meteoroid(xMeteorRange, yMeteorRange, 2, (int)((Math.random() *70+10) *(int)(Math.random()*3+1))));
+            }
+        }
+
+        bullets.removeIf(b -> b.getBullDecay() < 0);
+        //Removes bullet if the timer is less then zero
+
+
+        meteors.removeIf(m -> { // lambda function to check for collision between asteroids and bullets
+            boolean intersectsMeteor = bullets.stream().anyMatch(b -> m.getRect().intersects(b.getRect()));
+            //returns true if any bullets from the stream intersect with a meteoroid
+            if (intersectsMeteor) { // if there is an intersection the bullet is removed
+                bullets.removeIf(b -> m.getRect().intersects(b.getRect()));
+                if(m.getSize() > 0) {
+                    mAdd[0].set(true);
+                    m1[0] = new int[]{m.x, m.y, m.getSize() - 1, 0};
+                }
+            }
+            return intersectsMeteor; // if there is an intersect this would return true to the lambdas removeIf call
+        });
+        if(mAdd[0].get()) {
+            double randAngle = ((Math.random() *70+10)*(Math.random()*3+1));
+            meteors.add(new Meteoroid(m1[0][0],m1[0][1],m1[0][2], randAngle));
+            meteors.add(new Meteoroid(m1[0][0],m1[0][1],m1[0][2], randAngle-Math.random()*40));
+        }
 
 //        }
     }
+    //    private void checkCollision(ArrayList<SpaceObject>, Objects){
+//
+//    }
     public void actionPerformed(ActionEvent e) {
         collision();
         move();
