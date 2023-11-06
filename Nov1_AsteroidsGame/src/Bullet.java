@@ -9,7 +9,7 @@ public class Bullet extends SpaceObject{
     }
     public void drawBullet(Graphics g){
         bullDecay--;
-        g.drawOval(this.x,this.y,this.wid,this.wid);
+        g.drawOval(this.getX(),this.getY(),this.wid,this.wid);
     }
 
     public int getBullDecay() {

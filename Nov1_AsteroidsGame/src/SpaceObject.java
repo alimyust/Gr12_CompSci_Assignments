@@ -1,8 +1,8 @@
 import java.awt.*;
 
 public class SpaceObject {
-    protected int x;
-    protected int y;
+    private int x;
+    private int y;
     private int vx;
     private int vy;
     private int angle;

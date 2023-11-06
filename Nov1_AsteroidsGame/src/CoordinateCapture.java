@@ -24,7 +24,7 @@ public class CoordinateCapture extends JFrame implements KeyListener, MouseListe
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        g.drawOval(DIM/2,DIM/2,125-DIM/2,125-DIM/2);
+        g.drawOval(DIM/2 - 55,DIM/2- 55,110,110);
         for (int i = 1; i < xCoordinates.size(); i++) {
             int x1 = xCoordinates.get(i - 1);
             int y1 = yCoordinates.get(i - 1);
@@ -39,7 +39,8 @@ public class CoordinateCapture extends JFrame implements KeyListener, MouseListe
         yCoordinates.add(e.getY() - DIM/2);
         repaint();
         System.out.println("Clicked coordinates:");
-        System.out.println(out);
+        System.out.println((out +"")
+                .replace('[', '{').replace(']', '}'));
     }
     public static void main(String[] args) {
             CoordinateCapture frame = new CoordinateCapture();

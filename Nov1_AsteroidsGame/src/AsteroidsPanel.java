@@ -66,34 +66,38 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
                 meteors.add(new Meteoroid(xMeteorRange, yMeteorRange, 2, (int)((Math.random() *70+10) *(int)(Math.random()*3+1))));
             }
         }
-
         bullets.removeIf(b -> b.getBullDecay() < 0);
-        //Removes bullet if the timer is less then zero
-
+        //Removes bullet if the timer is less than zero
 
         meteors.removeIf(m -> { // lambda function to check for collision between asteroids and bullets
-            boolean intersectsMeteor = bullets.stream().anyMatch(b -> m.getRect().intersects(b.getRect()));
+            boolean intersectsMeteor = bullets.stream().anyMatch(b -> isCircleCollision(m,b));
             //returns true if any bullets from the stream intersect with a meteoroid
             if (intersectsMeteor) { // if there is an intersection the bullet is removed
-                bullets.removeIf(b -> m.getRect().intersects(b.getRect()));
+                bullets.removeIf(b -> isCircleCollision(m,b));
                 if(m.getSize() > 0) {
                     mAdd[0].set(true);
-                    m1[0] = new int[]{m.x, m.y, m.getSize() - 1, 0};
+                    m1[0] = new int[]{m.getX(), m.getY(), m.getSize() - 1, 0};
                 }
             }
             return intersectsMeteor; // if there is an intersect this would return true to the lambdas removeIf call
         });
+
         if(mAdd[0].get()) {
             double randAngle = ((Math.random() *70+10)*(Math.random()*3+1));
             meteors.add(new Meteoroid(m1[0][0],m1[0][1],m1[0][2], randAngle));
             meteors.add(new Meteoroid(m1[0][0],m1[0][1],m1[0][2], randAngle-Math.random()*40));
         }
-
-//        }
     }
-    //    private void checkCollision(ArrayList<SpaceObject>, Objects){
-//
-//    }
+
+    public boolean isCircleCollision(SpaceObject a,SpaceObject b){
+        int ax = a.getX();
+        int bx = b.getX();
+        int ay = a.getY();
+        int by = b.getY();
+        int dist = (int) Math.sqrt((bx-ax)*((bx-ax)) + ((by-ay))*((by-ay)));
+        return (dist < a.wid/2);
+    }
+
     public void actionPerformed(ActionEvent e) {
         collision();
         move();
