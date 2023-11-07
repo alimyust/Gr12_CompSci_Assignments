@@ -11,9 +11,11 @@ import java.util.stream.Collectors;
 class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, MouseListener {
     private static final int WIDTH = 800, HEIGHT = 600, DELAY = 10;
     private static final int INTRO = 0, GAME = 1;
-    int gameState = INTRO;
-
+    private int gameState = INTRO;
+    private int lives;
+    private int score;
     private int lvl; //amount of meteors
+    private int pDestroyedCount;
     private boolean[] keys;
     static Timer timer;
     Player p1;
@@ -22,11 +24,14 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
 
     public AsteroidsPanel() {
         keys = new boolean[KeyEvent.KEY_LAST + 1];
-        timer = new Timer(10, this);//Listens to this panel (makes loop)
+        timer = new Timer(DELAY, this);//Listens to this panel (makes loop)
         p1 = new Player();
         meteors = new ArrayList<Meteoroid>();
         bullets = new ArrayList<Bullet>();
         lvl = 3;
+        lives= 3;
+        score = 0;
+        pDestroyedCount = 60;
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setFocusable(true);
         requestFocus();
@@ -41,16 +46,22 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         } else if (gameState == GAME) {
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, WIDTH, HEIGHT);
-            p1.draw(g);
+            if(pDestroyedCount >= 60)
+                p1.draw(g);
             for(Meteoroid j: meteors)
                 j.drawMeteoroid(g);
             for(Bullet j: bullets)
                 j.drawBullet(g);
+            g.setFont(new Font("Arial", Font.BOLD,30));
+            g.drawString("Score: " +score, 30,40);
+            g.drawString("Lives: " + lives , 30,90);
+
         }
     }
 
     private void move() {
-        p1.movePlayer(keys);
+        if(pDestroyedCount >= 60)
+            p1.movePlayer(keys);
         for(Meteoroid j: meteors)
             j.moveSpaceObject();
         for(Bullet j: bullets)
@@ -60,6 +71,9 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         boolean meteorRem = false;
         ArrayList <Meteoroid> oldM = new ArrayList<>();
         // Arraylist to gather all meteors to remove
+        if(pDestroyedCount < 60)
+            pDestroyedCount --;
+        System.out.println(pDestroyedCount);
         if(meteors.isEmpty()) {
             lvl ++;
             for (int i = 0; i < lvl; i++) {
@@ -77,30 +91,38 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
             for(Meteoroid m: meteors) {
                 if(isCircleCollision(b,m)){
                     oldM.add(m);
+                    score += 15*(m.getSize()+1);
                     meteorRem = true;
                 }
             }
         }
-        for(Meteoroid m: meteors)
+        for(Meteoroid m: meteors) {
             bullets.removeIf(b -> isCircleCollision(m, b));
 
+            if(m.getRect().intersects(p1.playerRect()) && p1.getInvinceCounter() < 0){
+                oldM.add(m);
+                if(pDestroyedCount >= 60)
+                    meteorRem = true;
+                lives --;
+                pDestroyedCount--;
+            }
+        }
+        meteors.removeAll(oldM);
         if(meteorRem && oldM.get(0).getSize() > 0) {
             double randAngle = ((Math.random() * 70 + 10) * (Math.random() * 3 + 1));
             meteors.add(new Meteoroid(oldM.get(0).getX(), oldM.get(0).getY(), oldM.get(0).getSize()-1, randAngle));
             meteors.add(new Meteoroid(oldM.get(0).getX(), oldM.get(0).getY(), oldM.get(0).getSize()-1, randAngle - Math.random() * 40));
         }
-        meteors.removeAll(oldM);
+        newPlayer();
     }
 
-
-    public boolean isCircleCollision(SpaceObject a,SpaceObject b){
-        int ax = a.getX();
-        int bx = b.getX();
-        int ay = a.getY();
-        int by = b.getY();
-        int radiusSum = a.wid + b.wid;
-        double distSquared = Math.pow((bx - ax),2)+ Math.pow((by - ay),2);
-        return distSquared < Math.pow(radiusSum,2);
+    private void newPlayer() {
+        if(lives > 1 && pDestroyedCount < 0) {
+            System.out.println("new");
+            p1 = new Player();
+            pDestroyedCount = 60;
+            p1.setInvinceCounter(60);
+        }
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -109,13 +131,31 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         repaint();
     }
 
+    private boolean isCircleCollision(SpaceObject a,SpaceObject b){
+        int ax = a.getX();
+        int ay = a.getY();
+        int bx = b.getX();
+        int by = b.getY();
+        int radiusSum = a.wid + b.wid;
+        double distSquared = Math.pow((bx - ax),2)+ Math.pow((by - ay),2);
+        return distSquared < Math.pow(radiusSum,2);
+    }
+
+    public static int getWIDTH() {
+        return WIDTH;
+    }
+
+    public static int getHEIGHT() {
+        return HEIGHT;
+    }
+
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         keys[key] = true;
         //When the key is pressed the corresponding key is set to true
     }
-
+    @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
         keys[key] = false;
@@ -150,13 +190,5 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     @Override
     public void mouseExited(MouseEvent e) {
 
-    }
-
-    public static int getWIDTH() {
-        return WIDTH;
-    }
-
-    public static int getHEIGHT() {
-        return HEIGHT;
     }
 }

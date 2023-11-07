@@ -11,14 +11,12 @@ public class Player extends SpaceObject{
     private final int boost;
     private final int left;
     private final int right;
-    private final int score;
-    private final int lives;
     private double angle;
-
     private final int legDist; // angle legs are apart from middle (2*legDist = total dist)
     private final int legD ;
     private final int legLength ;
     private int bullCounter;
+    private int invinceCounter;
     //    public Player(int x, int y, double angle) {
 //        super(x, y, angle);
 //    }
@@ -31,9 +29,7 @@ public class Player extends SpaceObject{
         this.wid = 60;
         this.vx = 0;
         this.vy = 0;
-        this.score = 0;
         this.angle = 0;
-        this.lives = 3;
         this.boost = KeyEvent.VK_W;
         this.left = KeyEvent.VK_A;
         this.right = KeyEvent.VK_D;
@@ -41,6 +37,7 @@ public class Player extends SpaceObject{
         this.legD = 10;
         this.legLength=30;
         this.bullCounter = 40;
+        this.invinceCounter = 60;
         DEFAULT_SHIP = new double[][]{{-30,30,30}, {0,-15,15}};
     }
     public void movePlayer(boolean[] keys) {
@@ -49,7 +46,7 @@ public class Player extends SpaceObject{
         if(keys[KeyEvent.VK_SPACE] && bullCounter < 0) {
             AsteroidsPanel.bullets.add(new Bullet(this.x - (int) (legLength* getCos(angle)),
                     this.y - (int) (legLength * getSin(angle)), angle));
-            bullCounter = 3;
+            bullCounter = 10;
         }
         if (keys[this.boost]) {
             this.vx -= acc * getCos(angle);
@@ -86,9 +83,26 @@ public class Player extends SpaceObject{
     }
 
     public void draw(Graphics g) {
+        invinceCounter --;
+
         int[][] rotatedPoints = rotatePoints(DEFAULT_SHIP, this.angle,this.x,this.y);
         g.setColor(Color.BLUE);
-        g.drawPolygon(rotatedPoints[0],rotatedPoints[1],3);
+        if(invinceCounter < 0 || invinceCounter % 10 == 0)
+            g.drawPolygon(rotatedPoints[0],rotatedPoints[1],3);
+//        g.drawOval(this.x-this.wid,this.y-this.wid,this.wid*2,this.wid*2);
+        g.setColor(Color.RED);
+        g.drawRect(x-wid/2,y-wid/2,wid,wid);
+    }
+    public void deathAnimation(Graphics g){
+
+    }
+
+    public int getInvinceCounter() {
+        return invinceCounter;
+    }
+
+    public void setInvinceCounter(int invinceCounter) {
+        this.invinceCounter = invinceCounter;
     }
 }
 

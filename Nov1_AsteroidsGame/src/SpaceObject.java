@@ -42,9 +42,9 @@ public class SpaceObject {
         if (this.y < -wid)
             this.y = AsteroidsPanel.getHEIGHT();
     }
-    public Rectangle getRect(){
-        return new Rectangle(this.x,this.y,this.wid,this.wid);
-    }
+//    public Rectangle getRect(){
+//        return new Rectangle(this.x,this.y,this.wid,this.wid);
+//    }
     public static double getCos(double angle){
         return Math.cos(Math.toRadians(angle));
     }

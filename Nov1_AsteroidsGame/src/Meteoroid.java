@@ -45,9 +45,13 @@ public class Meteoroid extends SpaceObject{
         g.drawPolygon(rotatedPts[0],rotatedPts[1], BIG_PTS[0].length);
 //        g.drawOval(this.getX()-WID[size]/2,this.getY()-WID[size]/2, WID[size], WID[size]);
 //        g.drawOval(this.getX()-2,this.getY()-2, 4,4);
-
+        g.setColor(Color.RED);
+        g.drawRect(this.getX()-wid/2,this.getY()-wid/2,wid,wid);
 //        g.drawRect(this.x,this.y,WID[size], WID[size]);
 
+    }
+    public Rectangle getRect(){
+        return new Rectangle(this.getX()-wid/2,this.getY()-wid/2,wid,wid);
     }
 
     public int getSize() {
