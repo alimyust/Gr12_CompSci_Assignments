@@ -2,8 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, MouseListener {
     private static final int WIDTH = 800, HEIGHT = 600, DELAY = 10;
@@ -54,8 +57,9 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
             j.moveSpaceObject();
     }
     public void collision(){
-        final AtomicBoolean[] mAdd = {new AtomicBoolean(false)};
-        final int[][] m1 = new int[1][1];
+        boolean meteorRem = false;
+        ArrayList <Meteoroid> oldM = new ArrayList<>();
+        // Arraylist to gather all meteors to remove
         if(meteors.isEmpty()) {
             lvl ++;
             for (int i = 0; i < lvl; i++) {
@@ -69,33 +73,34 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         bullets.removeIf(b -> b.getBullDecay() < 0);
         //Removes bullet if the timer is less than zero
 
-        meteors.removeIf(m -> { // lambda function to check for collision between asteroids and bullets
-            boolean intersectsMeteor = bullets.stream().anyMatch(b -> isCircleCollision(m,b));
-            //returns true if any bullets from the stream intersect with a meteoroid
-            if (intersectsMeteor) { // if there is an intersection the bullet is removed
-                bullets.removeIf(b -> isCircleCollision(m,b));
-                if(m.getSize() > 0) {
-                    mAdd[0].set(true);
-                    m1[0] = new int[]{m.getX(), m.getY(), m.getSize() - 1, 0};
+        for(Bullet b: bullets) {
+            for(Meteoroid m: meteors) {
+                if(isCircleCollision(b,m)){
+                    oldM.add(m);
+                    meteorRem = true;
                 }
             }
-            return intersectsMeteor; // if there is an intersect this would return true to the lambdas removeIf call
-        });
-
-        if(mAdd[0].get()) {
-            double randAngle = ((Math.random() *70+10)*(Math.random()*3+1));
-            meteors.add(new Meteoroid(m1[0][0],m1[0][1],m1[0][2], randAngle));
-            meteors.add(new Meteoroid(m1[0][0],m1[0][1],m1[0][2], randAngle-Math.random()*40));
         }
+        for(Meteoroid m: meteors)
+            bullets.removeIf(b -> isCircleCollision(m, b));
+
+        if(meteorRem && oldM.get(0).getSize() > 0) {
+            double randAngle = ((Math.random() * 70 + 10) * (Math.random() * 3 + 1));
+            meteors.add(new Meteoroid(oldM.get(0).getX(), oldM.get(0).getY(), oldM.get(0).getSize()-1, randAngle));
+            meteors.add(new Meteoroid(oldM.get(0).getX(), oldM.get(0).getY(), oldM.get(0).getSize()-1, randAngle - Math.random() * 40));
+        }
+        meteors.removeAll(oldM);
     }
+
 
     public boolean isCircleCollision(SpaceObject a,SpaceObject b){
         int ax = a.getX();
         int bx = b.getX();
         int ay = a.getY();
         int by = b.getY();
-        int dist = (int) Math.sqrt((bx-ax)*((bx-ax)) + ((by-ay))*((by-ay)));
-        return (dist < a.wid/2);
+        int radiusSum = a.wid + b.wid;
+        double distSquared = Math.pow((bx - ax),2)+ Math.pow((by - ay),2);
+        return distSquared < Math.pow(radiusSum,2);
     }
 
     public void actionPerformed(ActionEvent e) {
