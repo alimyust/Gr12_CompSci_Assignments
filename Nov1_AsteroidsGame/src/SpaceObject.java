@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 
 public class SpaceObject {
@@ -7,6 +8,7 @@ public class SpaceObject {
     protected double vy;
     private int angle;
     protected int wid;
+    private int[][] dustParticles;
 
     public SpaceObject(){
     }
@@ -66,6 +68,14 @@ public class SpaceObject {
         }
         return rotatedPoints;
     }
+    public void dustAnimation(Graphics g){
+        for(int i = 0; i < 5; i++) {
+            g.drawOval(dustParticles[i][0], dustParticles[i][1], 1, 1);
+            dustParticles[i][0] += 3;
+            dustParticles[i][1] += 3;
+        }
+
+    }
 
     public int getX() {
         return x;
@@ -73,5 +83,9 @@ public class SpaceObject {
 
     public int getY() {
         return y;
+    }
+
+    public void setDustParticles(int[][] dustParticles) {
+        this.dustParticles = dustParticles;
     }
 }

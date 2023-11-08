@@ -2,18 +2,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, MouseListener {
     private static final int WIDTH = 800, HEIGHT = 600, DELAY = 10;
     private static final int INTRO = 0, GAME = 1, GAMEOVER = 2;
     private int gameState = INTRO;
     private int lives;
+    private final int[][] lifeIcon = {{50,60,40},{50,75,75}};
     private int score;
     private int lvl; //amount of meteors
     private int pDestroyedCount;
     private boolean[] keys;
     static Timer timer;
     Player p1;
+
+    Timer dustTimer;
+    private boolean isDust;
     ArrayList<Meteoroid> meteors;
     public static ArrayList<Bullet> bullets;
 
@@ -27,11 +32,27 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         lives= 3;
         score = 0;
         pDestroyedCount = 60;
+        isDust = false;
+        dustTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                endDust();
+            }
+        });
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setFocusable(true);
         requestFocus();
         addKeyListener(this);
         addMouseListener(this);
+    }
+    private void startDust() {
+        isDust = true;
+        dustTimer.start();
+
+    }
+    private void endDust() {
+        isDust = false;
+        dustTimer.stop();
     }
 
     public void paint(Graphics g) {
@@ -45,13 +66,21 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
                 p1.draw(g);
             if(pDestroyedCount < 60 && pDestroyedCount > 0)
                 p1.deathAnimation(g);
-            for(Meteoroid j: meteors)
+            for(Meteoroid j: meteors) {
                 j.drawMeteoroid(g);
+//                j.dustAnimation(g);
+            }
             for(Bullet j: bullets)
                 j.drawBullet(g);
+            for(int i=0; i < lives; i++) {
+                int[] xPts = lifeIcon[0].clone();
+                System.out.println(Arrays.toString(lifeIcon[0]));
+                for(int j = 0; j < xPts.length; j++)
+                    xPts[j] += 25*i;
+                g.drawPolygon(xPts, lifeIcon[1], 3);
+            }
             g.setFont(new Font("Arial", Font.BOLD,30));
             g.drawString("Score: " +score, 30,40);
-            g.drawString("Lives: " + lives , 30,90);
         } else if (gameState == GAMEOVER) {
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, WIDTH, HEIGHT);
@@ -87,7 +116,8 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
                 } while (!(xMeteorRange < 0 || xMeteorRange > WIDTH));
                 do {yMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getY() - 200) : p1.getY() + 200 + Math.random() * WIDTH);
                 }while(!(yMeteorRange < 0 || yMeteorRange > WIDTH));
-                meteors.add(new Meteoroid(xMeteorRange, yMeteorRange, 2, (int) ((Math.random() * 70 + 10) * (int) (Math.random() * 3 + 1))));
+                double newAngle = Math.random()*40+30;
+                meteors.add(new Meteoroid(xMeteorRange, yMeteorRange, 2, newAngle));
             }
         }
         bullets.removeIf(b -> b.getBullDecay() < 0);
@@ -99,6 +129,11 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
                     oldM.add(m);
                     score += 15*(m.getSize()+1);
                     meteorRem = true;
+                    m.setDustParticles(new int[][]{{(int) (m.getX()+ (Math.random() * 30)), (int) (m.getY()+ (Math.random() * 30))},
+                            {(int) (m.getX()+ (Math.random() * 30)), (int) (m.getY()+ (Math.random() * 30))},
+                            {(int) (m.getX()+ (Math.random() * 30)), (int) (m.getY()+ (Math.random() * 30))},
+                            {(int) (m.getX()+ (Math.random() * 30)), (int) (m.getY()+ (Math.random() * 30))},
+                            {(int) (m.getX()+ (Math.random() * 30)), (int) (m.getY()+ (Math.random() * 30))}});
                 }
             }
         }
@@ -121,8 +156,8 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         }
         meteors.removeAll(oldM);
         if(meteorRem && oldM.get(0).getSize() > 0) {
-            double randAngle = ((Math.random() * 70 + 10) * (Math.random() * 3 + 1));
-            meteors.add(new Meteoroid(oldM.get(0).getX(), oldM.get(0).getY(), oldM.get(0).getSize()-1, randAngle));
+            double randAngle = Math.random()*40+30;
+            meteors.add(new Meteoroid(oldM.get(0).getX(), oldM.get(0).getY(), oldM.get(0).getSize()-1, randAngle - Math.random() * 40));
             meteors.add(new Meteoroid(oldM.get(0).getX(), oldM.get(0).getY(), oldM.get(0).getSize()-1, randAngle - Math.random() * 40));
         }
         newPlayer();

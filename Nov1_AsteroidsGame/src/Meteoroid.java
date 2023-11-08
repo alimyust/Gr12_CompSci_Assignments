@@ -1,4 +1,5 @@
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
 
@@ -10,6 +11,8 @@ public class Meteoroid extends SpaceObject{
     private final double rotSpeed;
     private final double[][] BIG_PTS;
     private final double[][][] PTS;
+    Timer meteorDust;
+    boolean isDust;
     private final double[][][] POT_PTS = {
             {{-5, -45, -31, -28, 7, 11, 33, 42, 29, 15, 10}, {-47, 2, 24, 39, 46, 25, 30, -7, -34, -8, -42}},
             {{-24, 30, 41, 14, 18, -14, -32, -45, -19}, {-31, -30, -1, 34, 8, 15, 23, -8, -10}},
