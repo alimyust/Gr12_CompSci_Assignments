@@ -1,19 +1,22 @@
 import java.awt.*;
 
 public class SpaceObject {
-    private int x;
-    private int y;
-    private int vx;
-    private int vy;
+    protected int x;
+    protected int y;
+    protected double vx;
+    protected double vy;
     private int angle;
     protected int wid;
 
     public SpaceObject(){
     }
-    public SpaceObject(int x, int y,double angle) {
-        this(x,y,3,angle);
-        this.vx = 10;
-        this.vy = 10;
+    public SpaceObject(int x, int y,double angle,int vx, int vy, int wid) {
+        this.x = x;
+        this.y = y;
+        this.angle = (int)angle;
+        this.vx = vx;
+        this.vy = vy;
+        this.wid = wid;
     }
 
     public SpaceObject(int x, int y, int wid, double angle) {
@@ -21,8 +24,8 @@ public class SpaceObject {
         this.y = y;
         this.wid = wid;
         this.angle = (int) angle;
-        this.vx = (Math.random() > 0.5)?(int) (Math.random()*3+2):(int) -(Math.random()*3+2);
-        this.vy = (Math.random() > 0.5)?(int) (Math.random()*3+2):(int) -(Math.random()*3+2);
+        this.vx = (Math.random() > 0.5)?(int) (Math.random()*4+2):(int) -(Math.random()*4+2);
+        this.vy = (Math.random() > 0.5)?(int) (Math.random()*4+2):(int) -(Math.random()*4+2);
 //        System.out.println(angle + " , "+ vx + " , "+vy);
     }
     public void moveSpaceObject(){
@@ -33,14 +36,15 @@ public class SpaceObject {
 
     public void spaceObjectBoundary() {
         //Allows object to get out of frame before going to the other side
-        if (this.x > AsteroidsPanel.getWIDTH())
+//        System.out.println(this.x +" , " + this.y);
+        if (this.x - wid> AsteroidsPanel.getWIDTH())
             this.x = -wid;
-        if (this.x < -wid)
-            this.x = AsteroidsPanel.getWIDTH();
-        if (this.y > AsteroidsPanel.getHEIGHT())
+        if (this.x+wid < -wid)
+            this.x = AsteroidsPanel.getWIDTH()+wid;
+        if (this.y- wid > AsteroidsPanel.getHEIGHT())
             this.y = -wid;
-        if (this.y < -wid)
-            this.y = AsteroidsPanel.getHEIGHT();
+        if (this.y +wid< -wid)
+            this.y = AsteroidsPanel.getHEIGHT()+wid;
     }
 //    public Rectangle getRect(){
 //        return new Rectangle(this.x,this.y,this.wid,this.wid);

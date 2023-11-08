@@ -12,7 +12,6 @@ public class Asteroids extends JFrame{
 
     }
 
-    public static void main(String[] args) {
-        new Asteroids();
+    public static void main(String[] args) {new Asteroids();
     }
 }

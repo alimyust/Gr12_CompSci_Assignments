@@ -1,41 +1,25 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 //import java.awt.geom.AffineTransform;
 
 public class Player extends SpaceObject{
-    private int x;
-    private int y;
-    private double vx;
-    private double vy;
     private final int boost;
     private final int left;
     private final int right;
     private double angle;
-    private final int legDist; // angle legs are apart from middle (2*legDist = total dist)
-    private final int legD ;
-    private final int legLength ;
     private int bullCounter;
     private int invinceCounter;
     //    public Player(int x, int y, double angle) {
 //        super(x, y, angle);
 //    }
+    private double[][] blownShipPts;
     private double[][] DEFAULT_SHIP;
 
-    public Player() {
-        super();
-        this.x = AsteroidsPanel.getWIDTH() / 2;
-        this.y = AsteroidsPanel.getHEIGHT() / 2;
-        this.wid = 60;
-        this.vx = 0;
-        this.vy = 0;
-        this.angle = 0;
+    public Player(int x, int y, double angle, int vx, int vy,int wid) {
+        super(x,y,angle,vx,vy,wid);
         this.boost = KeyEvent.VK_W;
         this.left = KeyEvent.VK_A;
         this.right = KeyEvent.VK_D;
-        this.legDist = 50;
-        this.legD = 10;
-        this.legLength=30;
         this.bullCounter = 40;
         this.invinceCounter = 60;
         DEFAULT_SHIP = new double[][]{{-30,30,30}, {0,-15,15}};
@@ -43,10 +27,10 @@ public class Player extends SpaceObject{
     public void movePlayer(boolean[] keys) {
         double acc = 1;
         bullCounter--;
+        int[][] rotatedPoints = rotatePoints(DEFAULT_SHIP, this.angle,this.x,this.y);
         if(keys[KeyEvent.VK_SPACE] && bullCounter < 0) {
-            AsteroidsPanel.bullets.add(new Bullet(this.x - (int) (legLength* getCos(angle)),
-                    this.y - (int) (legLength * getSin(angle)), angle));
-            bullCounter = 10;
+            AsteroidsPanel.bullets.add(new Bullet(rotatedPoints[0][0],rotatedPoints[1][0], angle));
+            bullCounter = 2;
         }
         if (keys[this.boost]) {
             this.vx -= acc * getCos(angle);
@@ -66,34 +50,51 @@ public class Player extends SpaceObject{
         this.y += (int) this.vy;
         this.vx += (this.vx > acc/30) ? -acc / 30 : acc / 30;
         this.vy += (this.vy > acc/30) ? -acc / 30 : acc / 30;
-        playerBoundary();
+        spaceObjectBoundary();
     }
     public Rectangle playerRect(){ // Special case for player
         return new Rectangle(x-wid/2,y-wid/2,wid,wid);
     }
-    private void playerBoundary() {
-        if (this.x > AsteroidsPanel.getWIDTH())
-            this.x = 0;
-        if (this.x < 0)
-            this.x = AsteroidsPanel.getWIDTH();
-        if (this.y > AsteroidsPanel.getHEIGHT())
-            this.y = 0;
-        if (this.y < 0)
-            this.y = AsteroidsPanel.getHEIGHT();
+    public void spaceObjectBoundary() {
+        if (this.x - wid> AsteroidsPanel.getWIDTH())
+            this.x = -wid;
+        if (this.x+wid < -wid)
+            this.x = AsteroidsPanel.getWIDTH()+wid;
+        if (this.y- wid > AsteroidsPanel.getHEIGHT())
+            this.y = -wid;
+        if (this.y +wid< -wid)
+            this.y = AsteroidsPanel.getHEIGHT()+wid;
     }
 
     public void draw(Graphics g) {
         invinceCounter --;
 
         int[][] rotatedPoints = rotatePoints(DEFAULT_SHIP, this.angle,this.x,this.y);
-        g.setColor(Color.BLUE);
+        g.setColor(Color.WHITE);
         if(invinceCounter < 0 || invinceCounter % 10 == 0)
             g.drawPolygon(rotatedPoints[0],rotatedPoints[1],3);
-//        g.drawOval(this.x-this.wid,this.y-this.wid,this.wid*2,this.wid*2);
-        g.setColor(Color.RED);
-        g.drawRect(x-wid/2,y-wid/2,wid,wid);
+//        g.drawOval(this.x-this.wid/2,this.y-this.wid/2,this.wid,this.wid);
+//        g.setColor(Color.RED);
+//        g.drawRect(x-wid/2,y-wid/2,wid,wid);
     }
     public void deathAnimation(Graphics g){
+//        int x = this.blownShipPts[0];
+//        int y = this.blownShipPts[1];
+        g.setColor(Color.WHITE);
+    for(int i=0; i < 3; i++)
+        g.drawLine((int)blownShipPts[i][0],(int)blownShipPts[i][1],(int)blownShipPts[i][2],(int)blownShipPts[i][3]);
+    blownShipPts[0][0]+=0.5;
+    blownShipPts[0][1]+=0.5;
+    blownShipPts[0][2]+=0.5;
+    blownShipPts[0][3]+=0.5;
+    blownShipPts[1][0]-=0.5;
+    blownShipPts[1][1]-=0.5;
+    blownShipPts[1][2]-=0.5;
+    blownShipPts[1][3]-=0.5;
+    blownShipPts[2][0]+=0.5;
+    blownShipPts[2][1]+=0.5;
+    blownShipPts[2][2]+=0.5;
+    blownShipPts[2][3]+=0.5;
 
     }
 
@@ -103,6 +104,10 @@ public class Player extends SpaceObject{
 
     public void setInvinceCounter(int invinceCounter) {
         this.invinceCounter = invinceCounter;
+    }
+
+    public void setBlownShipPts(double[][] blownShipPts) {
+        this.blownShipPts = blownShipPts;
     }
 }
 
