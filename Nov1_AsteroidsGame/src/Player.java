@@ -18,14 +18,15 @@ public class Player extends SpaceObject {
                                     (Math.random()>0.5)?-0.5:0.5};
     private double[][] DEFAULT_SHIP;
 
-    public Player(int x, int y, double angle, int vx, int vy, int wid) {
-        super(x, y, angle, vx, vy, wid);
+    public Player() {
+        super(AsteroidsPanel.getWIDTH() / 2, AsteroidsPanel.getHEIGHT() / 2, 0.0, 0, 0,60);
         this.boost = KeyEvent.VK_W;
         this.left = KeyEvent.VK_A;
         this.right = KeyEvent.VK_D;
         this.bullCounter = 40;
         this.invinceCounter = 60;
-        DEFAULT_SHIP = new double[][]{{-30, 30, 30}, {0, -15, 15}};
+        //figured out the coords for the line in the middle using similar triangles
+        DEFAULT_SHIP = new double[][]{{30, -30, 30,20,20}, {-15, 0, 15,12,-12}};
     }
 
     public void movePlayer(boolean[] keys) {
@@ -33,7 +34,7 @@ public class Player extends SpaceObject {
         bullCounter--;
         int[][] rotatedPoints = rotatePoints(DEFAULT_SHIP, this.angle, this.x, this.y);
         if (keys[KeyEvent.VK_SPACE] && bullCounter < 0) {
-            AsteroidsPanel.bullets.add(new Bullet(rotatedPoints[0][0], rotatedPoints[1][0], angle));
+            AsteroidsPanel.bullets.add(new Bullet(rotatedPoints[0][1], rotatedPoints[1][1], angle));
             bullCounter = 10;
         }
         if (keys[this.boost]) {
@@ -67,32 +68,10 @@ public class Player extends SpaceObject {
         int[][] rotatedPoints = rotatePoints(DEFAULT_SHIP, this.angle, this.x, this.y);
         g.setColor(Color.WHITE);
         if (invinceCounter < 0 || invinceCounter % 10 == 0)
-            g.drawPolygon(rotatedPoints[0], rotatedPoints[1], 3);
+            g.drawPolygon(rotatedPoints[0], rotatedPoints[1], 5);
 //        g.drawOval(this.x-this.wid/2,this.y-this.wid/2,this.wid,this.wid);
 //        g.setColor(Color.RED);
 //        g.drawRect(x-wid/2,y-wid/2,wid,wid);
-    }
-
-    public void deathAnimation(Graphics g) {
-        g.setColor(Color.WHITE);
-//        boolean other = false;
-        for (int i = 0; i < 3; i++)
-            g.drawLine((int) blownShipPts[i][0], (int) blownShipPts[i][1], (int) blownShipPts[i][2], (int) blownShipPts[i][3]);
-        for (int i = 0; i < 3; i++) {
-            if(Math.random() > 0.5)
-//                other = true;
-            for (int j = 0; j < 4; j++) {
-//                if(other) {
-//                    if ((j & 2) == 0)
-//                        blownShipPts[i][j] += blownDir[i];
-//                    else;
-//                        blownShipPts[i][j] -= blownDir[i];
-//                }else {
-                    blownShipPts[i][j] += blownDir[i];
-//                }
-            }
-        }
-
     }
 
     public int getInvinceCounter() {
@@ -101,10 +80,6 @@ public class Player extends SpaceObject {
 
     public void setInvinceCounter(int invinceCounter) {
         this.invinceCounter = invinceCounter;
-    }
-
-    public void setBlownShipPts(double[][] blownShipPts) {
-        this.blownShipPts = blownShipPts;
     }
 }
 
