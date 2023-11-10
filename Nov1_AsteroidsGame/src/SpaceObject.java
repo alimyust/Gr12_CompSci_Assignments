@@ -26,8 +26,8 @@ public class SpaceObject {
         this.y = y;
         this.wid = wid;
         this.angle = (int) angle;
-        this.vx = (Math.random() > 0.5)?(int) (Math.random()*4+2):(int) -(Math.random()*4+2);
-        this.vy = (Math.random() > 0.5)?(int) (Math.random()*4+2):(int) -(Math.random()*4+2);
+        this.vx = (Math.random() > 0.5)?(int) (Math.random()*3+2):(int) -(Math.random()*3+2);
+        this.vy = (Math.random() > 0.5)?(int) (Math.random()*3+2):(int) -(Math.random()*3+2);
 //        System.out.println(angle + " , "+ vx + " , "+vy);
     }
     public void moveSpaceObject(){

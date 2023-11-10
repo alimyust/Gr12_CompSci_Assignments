@@ -2,9 +2,9 @@ import java.awt.*;
 
 public class Bullet extends SpaceObject{
     private int bullDecay;
-    public Bullet(int x, int y, double angle) {
-        super(x, y, angle,10,10,2);
-        bullDecay = 30;
+    public Bullet(int x, int y, double angle, int speed) {
+        super(x, y, angle,speed,speed,2);
+        bullDecay = 40;
         //Bullets range before despawning
     }
     public void drawBullet(Graphics g){

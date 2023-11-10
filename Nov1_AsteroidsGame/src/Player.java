@@ -9,24 +9,19 @@ public class Player extends SpaceObject {
     private double angle;
     private int bullCounter;
     private int invinceCounter;
-    //    public Player(int x, int y, double angle) {
-//        super(x, y, angle);
-//    }
-    private double[][] blownShipPts;
-    private final double[] blownDir = {(Math.random()>0.5)?-0.5:0.5,
-                                    (Math.random()>0.5)?-0.5:0.5,
-                                    (Math.random()>0.5)?-0.5:0.5};
+    private boolean isBoost;
     private double[][] DEFAULT_SHIP;
 
     public Player() {
-        super(AsteroidsPanel.getWIDTH() / 2, AsteroidsPanel.getHEIGHT() / 2, 0.0, 0, 0,60);
+        super(AsteroidsPanel.getWIDTH() / 2, AsteroidsPanel.getHEIGHT() / 2, 0.0, 0, 0, 60);
         this.boost = KeyEvent.VK_W;
         this.left = KeyEvent.VK_A;
         this.right = KeyEvent.VK_D;
         this.bullCounter = 40;
         this.invinceCounter = 60;
+        this.isBoost = false;
         //figured out the coords for the line in the middle using similar triangles
-        DEFAULT_SHIP = new double[][]{{30, -30, 30,20,20}, {-15, 0, 15,12,-12}};
+        DEFAULT_SHIP = new double[][]{{30, -30, 30, 20, 20}, {-15, 0, 15, 12, -12}};
     }
 
     public void movePlayer(boolean[] keys) {
@@ -34,27 +29,28 @@ public class Player extends SpaceObject {
         bullCounter--;
         int[][] rotatedPoints = rotatePoints(DEFAULT_SHIP, this.angle, this.x, this.y);
         if (keys[KeyEvent.VK_SPACE] && bullCounter < 0) {
-            AsteroidsPanel.bullets.add(new Bullet(rotatedPoints[0][1], rotatedPoints[1][1], angle));
+            AsteroidsPanel.bullets.add(new Bullet(rotatedPoints[0][1], rotatedPoints[1][1], angle, 10));
             bullCounter = 10;
         }
         if (keys[this.boost]) {
             this.vx -= acc * getCos(angle);
             this.vy -= acc * getSin(angle);
-        }
+            this.isBoost = true;
+        } else {this.isBoost = false;}
         if (keys[this.left])
             this.angle -= 6;
         if (keys[this.right])
             this.angle += 6;
+        int maxSpeed = 3;
+        if (Math.abs(this.vy) > maxSpeed)
+            this.vy = (this.vy > 0) ? maxSpeed : -maxSpeed;
+        if (Math.abs(this.vx) > maxSpeed)//speed limit
+            this.vx = (this.vx > 0) ? maxSpeed : -maxSpeed;
 
-        if (Math.abs(this.vy) > acc * 3)
-            this.vy = (this.vy > 0) ? acc * 3 : -acc * 3;
-        if (Math.abs(this.vx) > acc * 3)//speed limit
-            this.vx = (this.vx > 0) ? acc * 3 : -acc * 3;
-//        System.out.println(vx +" , "+ vy);
         this.x += (int) this.vx;
         this.y += (int) this.vy;
-        this.vx += (this.vx > acc / 30) ? -acc / 30 : acc / 30;
-        this.vy += (this.vy > acc / 30) ? -acc / 30 : acc / 30;
+        this.vx += (this.vx > acc / 100) ? -acc / 100 : acc / 100;
+        this.vy += (this.vy > acc / 100) ? -acc / 100 : acc / 100;
         spaceObjectBoundary();
     }
 
@@ -67,8 +63,11 @@ public class Player extends SpaceObject {
 
         int[][] rotatedPoints = rotatePoints(DEFAULT_SHIP, this.angle, this.x, this.y);
         g.setColor(Color.WHITE);
-        if (invinceCounter < 0 || invinceCounter % 10 == 0)
+        if (invinceCounter < 0 || invinceCounter % 10 == 0) {
             g.drawPolygon(rotatedPoints[0], rotatedPoints[1], 5);
+            if(this.isBoost && bullCounter % 3 == 0)
+                g.drawOval(rotatedPoints[0][0],rotatedPoints[0][0],10,10);
+        }
 //        g.drawOval(this.x-this.wid/2,this.y-this.wid/2,this.wid,this.wid);
 //        g.setColor(Color.RED);
 //        g.drawRect(x-wid/2,y-wid/2,wid,wid);

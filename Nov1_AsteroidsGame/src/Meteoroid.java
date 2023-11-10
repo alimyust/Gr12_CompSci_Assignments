@@ -5,13 +5,11 @@ import java.util.Arrays;
 
 public class Meteoroid extends SpaceObject{
     private static final int[] WID = {25,55,90};
-    private final int BIG = 2,MED = 1, SMALL = 0;
     private final int size;
     private double rotCount;
     private final double rotSpeed;
-    private final double[][] BIG_PTS;
     private final double[][][] PTS;
-    private final double[][][] POT_PTS = {
+    private final double[][][] POT_PTS = {//Potential points (different meteor shapes)
             {{-5, -45, -31, -28, 7, 11, 33, 42, 29, 15, 10}, {-47, 2, 24, 39, 46, 25, 30, -7, -34, -8, -42}},
             {{-24, 30, 41, 14, 18, -14, -32, -45, -19}, {-31, -30, -1, 34, 8, 15, 23, -8, -10}},
             {{-4, 37, 34, -2, 27, -12, -41, -44, -21, -27}, {-46, -14, 17, 18, 37, 40, 24, -7, -8, -36}},
@@ -23,7 +21,7 @@ public class Meteoroid extends SpaceObject{
         this.size = size;
         this.rotSpeed = Math.random()+5;
         this.rotCount = 1;
-        this.BIG_PTS = POT_PTS[(int) (Math.random()* POT_PTS.length)];
+        double[][] BIG_PTS = POT_PTS[(int) (Math.random()* POT_PTS.length)];
         double[][] MED_PTS = new double[2][BIG_PTS[0].length];
         double[][] SML_PTS = new double[2][BIG_PTS[0].length];
         for(int i=0 ; i <BIG_PTS[0].length; i++){
@@ -43,7 +41,7 @@ public class Meteoroid extends SpaceObject{
 //System.out.println(rotCount);
         int[][] rotatedPts = rotatePoints(PTS[size],rotCount,
                 this.getX(),this.getY());
-        g.drawPolygon(rotatedPts[0],rotatedPts[1], BIG_PTS[0].length);
+        g.drawPolygon(rotatedPts[0],rotatedPts[1], rotatedPts[0].length);
 //        g.drawOval(this.getX()-WID[size]/2,this.getY()-WID[size]/2, WID[size], WID[size]);
 //        g.drawOval(this.getX()-2,this.getY()-2, 4,4);
 //        g.setColor(Color.RED);

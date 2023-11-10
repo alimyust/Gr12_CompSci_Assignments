@@ -113,19 +113,22 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         do {xMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getX() - 200) : p1.getX() + 200 + Math.random() * WIDTH);
         } while (!(xMeteorRange < 0 || xMeteorRange > WIDTH));
         do {yMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getY() - 200) : p1.getY() + 200 + Math.random() * WIDTH);
-        } while (!(yMeteorRange < 0 || yMeteorRange > WIDTH));
-        double newAngle = Math.random() * 40 + 30;
+        } while (!(yMeteorRange < 0 || yMeteorRange > HEIGHT));
         // Arraylist to gather all meteors to remove
         if (pDestroyedCount < 90)
             pDestroyedCount--;
         if (meteors.isEmpty()) {
             lvl++;
-            for (int i = 0; i < lvl; i++)
+            for (int i = 0; i < lvl; i++) {
+                double newAngle = Math.random() * 40 + 30;
+                System.out.println(newAngle);
                 meteors.add(new Meteoroid(xMeteorRange, yMeteorRange, 2, newAngle));
+            }
         }
-        if (Math.random() * 5000 < 2 * lvl && ufos.isEmpty())
-            ufos.add(new UFO(xMeteorRange, yMeteorRange, 50, newAngle));
-
+        if (Math.random() * 5000 < 2 * lvl && ufos.isEmpty()) {
+            double newAngle = Math.random() * 40 + 30;
+            ufos.add(new UFO(xMeteorRange, yMeteorRange, (int) (Math.random() * 2), newAngle));
+        }
         bullets.forEach(b -> {
             meteors.stream()
                     .filter(m -> isCircleCollision(m, b))
@@ -137,11 +140,11 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
             meteors.removeIf(m ->isCircleCollision(m, b));
             ufos.forEach(u -> spaceObjectDestroyed( b, u, 100));
             ufos.removeIf(u ->isCircleCollision(u, b));
-            if (isCircleCollision(p1, b) &&b.getBullDecay() <25 && p1.getInvinceCounter() < 0)
+            if (isCircleCollision(p1, b) &&b.getBullDecay() <20 && p1.getInvinceCounter() < 0)
                 playerDestroyed();
         });
         bullets.removeIf(b -> b.getBullDecay() < 0);
-        bullets.removeIf(b -> isCircleCollision(p1, b) && b.getBullDecay() <25);
+        bullets.removeIf(b -> isCircleCollision(p1, b) && b.getBullDecay() <35);
         dustParticles.removeIf(DustParticles::getTime);
         for (Meteoroid m : meteors)
             if (m.getRect().intersects(p1.playerRect()) && p1.getInvinceCounter() < 0 && pDestroyedCount >= 90)
