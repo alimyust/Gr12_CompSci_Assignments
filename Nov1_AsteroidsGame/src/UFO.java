@@ -15,7 +15,7 @@ public class UFO extends SpaceObject{
     private void ufoShoot(Player p1){
         bullCounter++;
         double shootingAngle = Math.atan2((p1.getY() - y),(p1.getX()-x ));// Math.PI/2;
-        System.out.println((double)wid/1.5);
+//        System.out.println((double)wid/1.5);
         if(bullCounter % 100 == 0){
             AsteroidsPanel.bullets.add(new Bullet( x+(int) ((double)wid*1.1*Math.cos(shootingAngle)),
                     y+(int) ((double)wid*1.1*Math.sin(shootingAngle)),Math.toDegrees(shootingAngle + Math.PI)));

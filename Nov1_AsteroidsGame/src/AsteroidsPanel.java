@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, MouseListener {
     private static final int WIDTH = 800, HEIGHT = 900, DELAY = 10;
@@ -17,8 +18,6 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     static Timer timer;
     Player p1;
 
-    Timer dustTimer;
-    private boolean isDust;
     private final ArrayList<DustParticles> dustParticles;
     private final ArrayList<Meteoroid> meteors;
     public static ArrayList<Bullet> bullets;
@@ -38,8 +37,6 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         pDestroyedCount = 90;
         timer.start();
 
-//        isDust = false;
-//        dustTimer = new Timer(1000, e -> endDust());
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setFocusable(true);
         requestFocus();
@@ -109,87 +106,54 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     }
 
     public void collision() {
-        boolean meteorRem = false;
-        boolean ufoRem = false;
         ArrayList<Meteoroid> oldM = new ArrayList<>();
+        ArrayList<Bullet> oldB = new ArrayList<>();
         ArrayList<UFO> oldU = new ArrayList<>();
-
         int xMeteorRange, yMeteorRange;
+        do {xMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getX() - 200) : p1.getX() + 200 + Math.random() * WIDTH);
+        } while (!(xMeteorRange < 0 || xMeteorRange > WIDTH));
+        do {yMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getY() - 200) : p1.getY() + 200 + Math.random() * WIDTH);
+        } while (!(yMeteorRange < 0 || yMeteorRange > WIDTH));
+        double newAngle = Math.random() * 40 + 30;
         // Arraylist to gather all meteors to remove
         if (pDestroyedCount < 90)
             pDestroyedCount--;
         if (meteors.isEmpty()) {
-            System.out.println("NEW METEORS");
             lvl++;
-            for (int i = 0; i < lvl; i++) {
-                do {
-                    xMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getX() - 200) : p1.getX() + 200 + Math.random() * WIDTH);
-                } while (!(xMeteorRange < 0 || xMeteorRange > WIDTH));
-                do {
-                    yMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getY() - 200) : p1.getY() + 200 + Math.random() * WIDTH);
-                } while (!(yMeteorRange < 0 || yMeteorRange > WIDTH));
-                double newAngle = Math.random() * 40 + 30;
+            for (int i = 0; i < lvl; i++)
                 meteors.add(new Meteoroid(xMeteorRange, yMeteorRange, 2, newAngle));
-            }
         }
-        if (Math.random() * 1000 < 2 * lvl && ufos.isEmpty()) {
-            do {
-                xMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getX() - 200) : p1.getX() + 200 + Math.random() * WIDTH);
-            } while (!(xMeteorRange < 0 || xMeteorRange > WIDTH));
-            do {
-                yMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getY() - 200) : p1.getY() + 200 + Math.random() * WIDTH);
-            } while (!(yMeteorRange < 0 || yMeteorRange > WIDTH));
-            double newAngle = Math.random() * 40 + 30;
+        if (Math.random() * 5000 < 2 * lvl && ufos.isEmpty())
             ufos.add(new UFO(xMeteorRange, yMeteorRange, 50, newAngle));
-        }
-        bullets.removeIf(b -> b.getBullDecay() < 0);
-        //Removes bullet if the timer is less than zero
-        dustParticles.removeIf(DustParticles::getTime);
 
-        for (Bullet b : bullets) {
-            for (Meteoroid m : meteors) {
-                if (isCircleCollision(b, m)) {
-                    oldM.add(m);
-                    score += 15 * (m.getSize() + 1);
-                    meteorRem = true;
-                    double newAngle = Math.random() * 360;
-                    for (int i = 0; i < Math.random() * 5 + 2; i++)
-                        dustParticles.add(new DustParticles((int) (m.getX() + (Math.random() * 30)),
-                                (int) (m.getY() + (Math.random() * 30)), newAngle, PARTICLE));
-                }
-                for (UFO u : ufos) {
-                    if (isCircleCollision(b, u)) {
-                        oldU.add(u);
-                        ufoRem = true;
-                        score += 100;
-                        double newAngle = Math.random() * 360;
-                        for (int i = 0; i < Math.random() * 5 + 2; i++)
-                            dustParticles.add(new DustParticles((int) (u.getX() + (Math.random() * 30)),
-                                    (int) (u.getY() + (Math.random() * 30)), newAngle, PARTICLE));
-                    }
-                }
-            }
-        }
-        for (Meteoroid m : meteors) {
-            bullets.removeIf(b -> isCircleCollision(m, b));
-            if (m.getRect().intersects(p1.playerRect()) && p1.getInvinceCounter() < 0) {
-                if (pDestroyedCount >= 90) {
-                    lives--;
-                    pDestroyedCount--;
-                    double newAngle = Math.random() * 360;
-                    isDust = true;
-                    for (int i = 0; i < 3; i++)
-                        dustParticles.add(new DustParticles((int) (p1.getX() + (Math.random() * 30)),
-                                (int) (p1.getY() + (Math.random() * 30)), newAngle, LINE));
-                }
-            }
-        }
+        bullets.forEach(b -> {
+            meteors.stream()
+                    .filter(m -> isCircleCollision(m, b))
+                    .forEach(m -> {
+                        oldM.add(m);
+                        oldB.add(b);
+                    });
+            meteors.forEach(m -> spaceObjectDestroyed( b, m, 5*lvl+m.getSize() + 1));
+            meteors.removeIf(m ->isCircleCollision(m, b));
+            ufos.forEach(u -> spaceObjectDestroyed( b, u, 100));
+            ufos.removeIf(u ->isCircleCollision(u, b));
+            if (isCircleCollision(p1, b) &&b.getBullDecay() <25 && p1.getInvinceCounter() < 0)
+                playerDestroyed();
+        });
+        bullets.removeIf(b -> b.getBullDecay() < 0);
+        bullets.removeIf(b -> isCircleCollision(p1, b) && b.getBullDecay() <25);
+        dustParticles.removeIf(DustParticles::getTime);
+        for (Meteoroid m : meteors)
+            if (m.getRect().intersects(p1.playerRect()) && p1.getInvinceCounter() < 0 && pDestroyedCount >= 90)
+                    playerDestroyed();
+        bullets.removeAll(oldB);
         meteors.removeAll(oldM);
         ufos.removeAll(oldU);
-        if (meteorRem && oldM.get(0).getSize() > 0) {
+        if (!oldM.isEmpty() &&oldM.get(0).getSize() > 0) {
+            Meteoroid m=oldM.get(0);
             double randAngle = Math.random() * 40 + 30;
-            meteors.add(new Meteoroid(oldM.get(0).getX(), oldM.get(0).getY(), oldM.get(0).getSize() - 1, randAngle - Math.random() * 40));
-            meteors.add(new Meteoroid(oldM.get(0).getX(), oldM.get(0).getY(), oldM.get(0).getSize() - 1, randAngle - Math.random() * 40));
+            meteors.add(new Meteoroid(m.getX(), m.getY(), m.getSize() - 1, randAngle - Math.random() * 40));
+            meteors.add(new Meteoroid(m.getX(), m.getY(), m.getSize() - 1, randAngle - Math.random() * 40));
         }
         newPlayer();
     }
@@ -204,7 +168,30 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         }
 
     }
+    private void playerDestroyed(){
+        lives--;
+        pDestroyedCount--;
+        double newAngle = Math.random() * 360;
+        for (int i = 0; i < 3; i++)
+            dustParticles.add(new DustParticles((int) (p1.getX() + (Math.random() * 30)),
+                    (int) (p1.getY() + (Math.random() * 30)), newAngle, LINE));
+    }
 
+    private void spaceObjectDestroyed(SpaceObject b, SpaceObject u, int scorePlus){
+        if (isCircleCollision(b, u)) {
+            score += scorePlus;
+            double newAngle = Math.random() * 360;
+            for (int i = 0; i < Math.random() * 5 + 2; i++)
+                dustParticles.add(new DustParticles((int) (u.getX() + (Math.random() * 30)),
+                        (int) (u.getY() + (Math.random() * 30)), newAngle, PARTICLE));
+        }
+    }
+    
+    private void newMeteors(Meteoroid m){
+        double randAngle = Math.random() * 40 + 30;
+        meteors.add(new Meteoroid(m.getX(), m.getY(), m.getSize() - 1, randAngle - Math.random() * 40));
+        meteors.add(new Meteoroid(m.getX(), m.getY(), m.getSize() - 1, randAngle - Math.random() * 40));
+    }
     private boolean isCircleCollision(SpaceObject a, SpaceObject b) {
         int ax = a.getX();
         int ay = a.getY();
