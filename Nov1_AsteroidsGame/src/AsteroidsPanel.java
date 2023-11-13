@@ -2,9 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, MouseListener {
+
     private static final int WIDTH = 800, HEIGHT = 900, DELAY = 10;
     private static final int INTRO = 0, GAME = 1, GAMEOVER = 2;
     private final boolean PARTICLE = false, LINE = true;
@@ -22,6 +21,8 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     private final ArrayList<Meteoroid> meteors;
     public static ArrayList<Bullet> bullets;
     private final ArrayList<UFO> ufos;
+    private final int[] PLAYGAME_RECT = {WIDTH/2-125, HEIGHT/2,250,50};
+    private final int[] TITLE_RECT = {WIDTH / 2-260, HEIGHT / 2-150,520,75};
 
     public AsteroidsPanel() {
         keys = new boolean[KeyEvent.KEY_LAST + 1];
@@ -31,10 +32,12 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         bullets = new ArrayList<Bullet>();
         dustParticles = new ArrayList<DustParticles>();
         ufos = new ArrayList<UFO>();
+
         lvl = 3;
         lives = 3;
         score = 0;
         pDestroyedCount = 90;
+
         timer.start();
 
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -54,6 +57,14 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         if (gameState == INTRO) {
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, WIDTH, HEIGHT);
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Hyperspace", Font.BOLD, 90));
+            g.drawString("ASTEROIDS",TITLE_RECT[0], TITLE_RECT[1] + TITLE_RECT[3]);
+            g.drawRect(TITLE_RECT[0],TITLE_RECT[1],TITLE_RECT[2],TITLE_RECT[3]);
+            g.setFont(new Font("Hyperspace", Font.BOLD, 45));
+            g.drawString("PLAY GAME", PLAYGAME_RECT[0], PLAYGAME_RECT[1]+PLAYGAME_RECT[3]);
+            g.drawRect(PLAYGAME_RECT[0],PLAYGAME_RECT[1],PLAYGAME_RECT[2],PLAYGAME_RECT[3]);
+
             for (Meteoroid j : meteors)
                 j.drawMeteoroid(g);
         } else if (gameState == GAME) {
@@ -69,12 +80,7 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
                 j.drawBullet(g);
             for (UFO j : ufos)
                 j.drawUFO(g, p1);
-            for (int i = 0; i < lives; i++) {
-                int[] xPts = lifeIcon[0].clone();
-                for (int j = 0; j < xPts.length; j++)
-                    xPts[j] += 25 * i;
-                g.drawPolygon(xPts, lifeIcon[1], 5);
-            }
+            drawLifeIcon(g);
             g.setFont(new Font("Arial", Font.BOLD, 30));
             g.drawString("Score: " + score, 30, 40);
         } else if (gameState == GAMEOVER) {
@@ -86,6 +92,8 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
                 j.drawBullet(g);
             for (DustParticles j : dustParticles)
                 j.drawDust(g);
+            for (UFO j : ufos)
+                j.drawUFO(g, p1);
             g.setFont(new Font("Arial", Font.BOLD, 30));
             g.drawString("GAME OVER", WIDTH / 2 - 40, HEIGHT / 2);
             g.drawString("Score: " + score, WIDTH / 2 - 50, HEIGHT / 2 - 40);
@@ -108,27 +116,16 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     public void collision() {
         ArrayList<Meteoroid> oldM = new ArrayList<>();
         ArrayList<Bullet> oldB = new ArrayList<>();
-        ArrayList<UFO> oldU = new ArrayList<>();
-        int xMeteorRange, yMeteorRange;
-        do {xMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getX() - 200) : p1.getX() + 200 + Math.random() * WIDTH);
-        } while (!(xMeteorRange < 0 || xMeteorRange > WIDTH));
-        do {yMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getY() - 200) : p1.getY() + 200 + Math.random() * WIDTH);
-        } while (!(yMeteorRange < 0 || yMeteorRange > HEIGHT));
         // Arraylist to gather all meteors to remove
         if (pDestroyedCount < 90)
             pDestroyedCount--;
         if (meteors.isEmpty()) {
             lvl++;
-            for (int i = 0; i < lvl; i++) {
-                double newAngle = Math.random() * 40 + 30;
-                System.out.println(newAngle);
-                meteors.add(new Meteoroid(xMeteorRange, yMeteorRange, 2, newAngle));
-            }
+            for (int i = 0; i < lvl; i++)
+                meteors.add(new Meteoroid(getMeteorRange(WIDTH), getMeteorRange(HEIGHT), (int) (Math.random()*2+1), newAngle()));
         }
-        if (Math.random() * 5000 < 2 * lvl && ufos.isEmpty()) {
-            double newAngle = Math.random() * 40 + 30;
-            ufos.add(new UFO(xMeteorRange, yMeteorRange, (int) (Math.random() * 2), newAngle));
-        }
+        if (Math.random() * 20 < 2 * lvl && ufos.isEmpty())
+            ufos.add(new UFO(getMeteorRange(WIDTH), getMeteorRange(HEIGHT), (int) (Math.random() * 2), newAngle()));
         bullets.forEach(b -> {
             meteors.stream()
                     .filter(m -> isCircleCollision(m, b))
@@ -151,13 +148,11 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
                     playerDestroyed();
         bullets.removeAll(oldB);
         meteors.removeAll(oldM);
-        ufos.removeAll(oldU);
         if (!oldM.isEmpty() &&oldM.get(0).getSize() > 0) {
-            Meteoroid m=oldM.get(0);
-            double randAngle = Math.random() * 40 + 30;
-            meteors.add(new Meteoroid(m.getX(), m.getY(), m.getSize() - 1, randAngle - Math.random() * 40));
-            meteors.add(new Meteoroid(m.getX(), m.getY(), m.getSize() - 1, randAngle - Math.random() * 40));
-        }
+            Meteoroid m=oldM.get(0); // ^ If there is something to remove in oldM, and it isn't the smallest size
+            meteors.add(new Meteoroid(m.getX(), m.getY(), m.getSize() - 1, newAngle()));
+            meteors.add(new Meteoroid(m.getX(), m.getY(), m.getSize() - 1, newAngle()));
+        } //^ add 2 meteors with new angles and a smaller size
         newPlayer();
     }
 
@@ -195,6 +190,10 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         meteors.add(new Meteoroid(m.getX(), m.getY(), m.getSize() - 1, randAngle - Math.random() * 40));
         meteors.add(new Meteoroid(m.getX(), m.getY(), m.getSize() - 1, randAngle - Math.random() * 40));
     }
+    private double newAngle(){
+        return Math.random() * 40 + 30;
+    }
+
     private boolean isCircleCollision(SpaceObject a, SpaceObject b) {
         int ax = a.getX();
         int ay = a.getY();
@@ -204,7 +203,20 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         double distSquared = Math.pow((bx - ax), 2) + Math.pow((by - ay), 2);
         return distSquared < Math.pow(radiusSum, 2);
     }
-
+    private void drawLifeIcon(Graphics g){
+        for (int i = 0; i < lives; i++) {
+            int[] xPts = lifeIcon[0].clone();
+            for (int j = 0; j < xPts.length; j++)
+                xPts[j] += 25 * i;
+            g.drawPolygon(xPts, lifeIcon[1], 5);
+        }
+    }
+    public int getMeteorRange(int dir){
+        int xMeteorRange;
+        do {xMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getX() - 200) : p1.getX() + 200 + Math.random() * dir);
+        } while (!(xMeteorRange < 0 || xMeteorRange > dir));
+        return  xMeteorRange;
+    }
     public static int getWIDTH() {
         return WIDTH;
     }
@@ -229,7 +241,14 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        gameState = GAME;
+        System.out.println(getMousePosition().getLocation());
+        if(inRect(getMousePosition().getLocation(),PLAYGAME_RECT))
+            gameState = GAME;
+    }
+    private boolean inRect(Point p, int[] arr){
+        if(p.x > arr[0] && p.x < arr[0] + arr[2] )
+            return p.y > arr[1] && p.y < arr[1] + arr[3];
+        return false; //More readable in 2 statements
     }
 
     @Override

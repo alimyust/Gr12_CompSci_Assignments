@@ -1,17 +1,20 @@
 import javax.swing.*;
 
 public class Asteroids extends JFrame{
-     static AsteroidsPanel asteroidsPanel = new AsteroidsPanel();
+     AsteroidsPanel asteroidsPanel = new AsteroidsPanel();
 
     public Asteroids() {
         super("Asteroids");
         add(asteroidsPanel);
-        pack();
+        setSize(800,900);
+//        pack();
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
     }
 
-    public static void main(String[] args) {new Asteroids();
+    public static void main(String[] args) {
+        System.setProperty("jna.library.path", "Nov1_AsteroidsGame/src/lib");
+        new Asteroids();
     }
 }

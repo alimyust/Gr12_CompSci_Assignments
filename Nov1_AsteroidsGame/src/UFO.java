@@ -2,7 +2,7 @@ import java.awt.*;
 
 public class UFO extends SpaceObject{
     private int bullCounter;
-    private double[][] ufoPts = {{-50,50,20,-20,-50,-20,-10,10,20,-20,20,50},{0,0,20,20,0,-20,-30,-30,-20,-20,-20,0}};
+    private double[][] ufoPts = {{-40,40,20,-20,-40,-20,-10,10,20,-20,20,40},{0,0,20,20,0,-20,-30,-30,-20,-20,-20,0}};
     private double[][] currPts;
 
     private final static int[] WID = {50,20};
@@ -22,7 +22,7 @@ public class UFO extends SpaceObject{
         int [][]rotatePoints = rotatePoints(currPts,0,x,y);
         ufoShoot(p1);
         g.setColor(Color.RED);
-        g.drawOval(x-wid/2,y-wid/2,wid,wid);
+//        g.drawOval(x-wid/2,y-wid/2,wid,wid);
         g.drawPolygon(rotatePoints[0],rotatePoints[1],12);
         g.setColor(Color.WHITE);
     }

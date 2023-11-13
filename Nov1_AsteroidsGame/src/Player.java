@@ -10,18 +10,17 @@ public class Player extends SpaceObject {
     private int bullCounter;
     private int invinceCounter;
     private boolean isBoost;
-    private double[][] DEFAULT_SHIP;
+    private final double[][] DEFAULT_SHIP;
 
     public Player() {
         super(AsteroidsPanel.getWIDTH() / 2, AsteroidsPanel.getHEIGHT() / 2, 0.0, 0, 0, 60);
         this.boost = KeyEvent.VK_W;
         this.left = KeyEvent.VK_A;
         this.right = KeyEvent.VK_D;
-        this.bullCounter = 40;
+        this.bullCounter = 10;
         this.invinceCounter = 60;
         this.isBoost = false;
-        //figured out the coords for the line in the middle using similar triangles
-        DEFAULT_SHIP = new double[][]{{30, -30, 30, 20, 20}, {-15, 0, 15, 12, -12}};
+        DEFAULT_SHIP = new double[][]{{30, -30, 30, 20, 20,28,20,28,20,20}, {-15, 0, 15, 12, -12,-6,0,6,12,-12}};
     }
 
     public void movePlayer(boolean[] keys) {
@@ -64,9 +63,10 @@ public class Player extends SpaceObject {
         int[][] rotatedPoints = rotatePoints(DEFAULT_SHIP, this.angle, this.x, this.y);
         g.setColor(Color.WHITE);
         if (invinceCounter < 0 || invinceCounter % 10 == 0) {
-            g.drawPolygon(rotatedPoints[0], rotatedPoints[1], 5);
-            if(this.isBoost && bullCounter % 3 == 0)
-                g.drawOval(rotatedPoints[0][0],rotatedPoints[0][0],10,10);
+            if(this.isBoost && bullCounter % 5 == 0)
+                g.drawPolygon(rotatedPoints[0], rotatedPoints[1], 10);
+            else
+                g.drawPolygon(rotatedPoints[0], rotatedPoints[1], 5);
         }
 //        g.drawOval(this.x-this.wid/2,this.y-this.wid/2,this.wid,this.wid);
 //        g.setColor(Color.RED);
@@ -81,19 +81,3 @@ public class Player extends SpaceObject {
         this.invinceCounter = invinceCounter;
     }
 }
-
-
-//        g.drawLine(x,y,this.x - (int) (legLength* getCos(angle)), this.y - (int) (legLength * getSin(angle)));
-//        g.drawRect(x-wid/2,y-wid/2,wid,wid);
-//        g.setColor(Color.GREEN);
-//        g.drawLine(this.x - (int) (30* getCos(angle)), this.y - (int) (30 * getSin(angle)),
-//                this.x + (int) (50* getCos(angle)), this.y + (int) (50 * getSin(angle)));
-
-
-//        g.drawLine((int) (x-outer*getCos(angle)), (int) (y-outer*getSin(angle)),
-//                (int) (x+outer*getCos(angle+legSpread)), (int) (y+outer*getSin(angle+legSpread)));
-//
-//                g.drawLine((int) (x-outer*getCos(angle)), (int) (y-outer*getSin(angle)),
-//                (int) (x+outer*getCos(angle-legSpread)), (int) (y+outer*getSin(angle-legSpread)));
-////        g.setColor(Color.GREEN);
-//        g.drawLine(x,y, (int) (x-outer*getCos(angle)), (int) (y-outer*getSin(angle)));
