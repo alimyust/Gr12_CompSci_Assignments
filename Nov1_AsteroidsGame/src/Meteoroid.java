@@ -38,14 +38,8 @@ public class Meteoroid extends SpaceObject{
     public void drawMeteoroid(Graphics g) {
         rotCount = (rotCount%360 ==0)?1:rotCount+rotSpeed;
         g.setColor(Color.white);
-//System.out.println(rotCount);
-        int[][] rotatedPts = rotatePoints(PTS[size],rotCount,
-                this.getX(),this.getY());
+        int[][] rotatedPts = rotatePoints(PTS[size],rotCount,this.getX(),this.getY());
         g.drawPolygon(rotatedPts[0],rotatedPts[1], rotatedPts[0].length);
-//        g.drawOval(this.getX()-WID[size]/2,this.getY()-WID[size]/2, WID[size], WID[size]);
-//        g.drawOval(this.getX()-2,this.getY()-2, 4,4);
-//        g.setColor(Color.RED);
-//        g.drawRect(this.getX()-wid/2,this.getY()-wid/2,wid,wid);
 
     }
     public Rectangle getRect(){

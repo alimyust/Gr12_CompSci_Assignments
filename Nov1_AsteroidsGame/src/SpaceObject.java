@@ -6,12 +6,9 @@ public class SpaceObject {
     protected int y;
     protected double vx;
     protected double vy;
-    private int angle;
+    private final int angle;
     protected int wid;
     private int[][] dustParticles;
-
-    public SpaceObject(){
-    }
     public SpaceObject(int x, int y,double angle,int vx, int vy, int wid) {
         this.x = x;
         this.y = y;
@@ -26,8 +23,8 @@ public class SpaceObject {
         this.y = y;
         this.wid = wid;
         this.angle = (int) angle;
-        this.vx = (Math.random() > 0.5)?(int) (Math.random()*3+2):(int) -(Math.random()*3+2);
-        this.vy = (Math.random() > 0.5)?(int) (Math.random()*3+2):(int) -(Math.random()*3+2);
+        this.vx = (Math.random() > 0.5)? (Math.random()*3+2):- (Math.random()*3+2);
+        this.vy = this.vx;//(Math.random() > 0.5)? (Math.random()*23+2):- (Math.random()*23+2);
 //        System.out.println(angle + " , "+ vx + " , "+vy);
     }
     public void moveSpaceObject(){
