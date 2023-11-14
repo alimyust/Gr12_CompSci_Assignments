@@ -145,8 +145,7 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
 //        g.drawRect(SCORE_MENU_RECT[0],SCORE_MENU_RECT[1],SCORE_MENU_RECT[2],SCORE_MENU_RECT[3]);
         for(int i = 0; i < 5; i++){
 
-            ArrayList<Integer> currScore = orderedScores();
-            currScore.sort(Comparator.reverseOrder());
+            String currScore = orderedScores().get(i) + "";
             g.drawString(currScore, TOPSCORE_RECT[0] - currScore.length() * 10,
                     TOPSCORE_RECT[1] + TOPSCORE_RECT[3]+ i*(TOPSCORE_RECT[3] + 5)-200);
 //            g.drawRect(TOPSCORE_RECT[0],TOPSCORE_RECT[1] + i*(TOPSCORE_RECT[3] + 5)-200,TOPSCORE_RECT[2],TOPSCORE_RECT[3]);
