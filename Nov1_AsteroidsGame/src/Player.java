@@ -10,7 +10,8 @@ public class Player extends SpaceObject {
     private int bullCounter;
     private int invinceCounter;
     private boolean isBoost;
-    private final double[][] DEFAULT_SHIP;
+    private final double[][] DEFAULT_SHIP = new double[][]{
+            {30, -30, 30, 20, 20,35,20,35,20,20}, {-15, 0, 15, 12, -12,-6,0,6,12,-12}};
 
     public Player() {
         super(AsteroidsPanel.getWIDTH() / 2, AsteroidsPanel.getHEIGHT() / 2, 0.0, 0, 0, 60);
@@ -20,7 +21,6 @@ public class Player extends SpaceObject {
         this.bullCounter = 10;
         this.invinceCounter = 60;
         this.isBoost = false;
-        DEFAULT_SHIP = new double[][]{{30, -30, 30, 20, 20,28,20,28,20,20}, {-15, 0, 15, 12, -12,-6,0,6,12,-12}};
     }
 
     public void movePlayer(boolean[] keys) {
@@ -37,9 +37,9 @@ public class Player extends SpaceObject {
             this.isBoost = true;
         } else {this.isBoost = false;}
         if (keys[this.left])
-            this.angle -= 6;
+            this.angle -= 3;
         if (keys[this.right])
-            this.angle += 6;
+            this.angle += 3;
         int maxSpeed = 3;
         if (Math.abs(this.vy) > maxSpeed)
             this.vy = (this.vy > 0) ? maxSpeed : -maxSpeed;
