@@ -12,25 +12,30 @@ public class Player extends SpaceObject {
     private boolean isBoost;
     private final double[][] DEFAULT_SHIP = new double[][]{
             {30, -30, 30, 20, 20,35,20,35,20,20}, {-15, 0, 15, 12, -12,-6,0,6,12,-12}};
-
+private boolean oldSpace;
+private boolean space;
     public Player() {
-        super(AsteroidsPanel.getWIDTH() / 2, AsteroidsPanel.getHEIGHT() / 2, 0.0, 0, 0, 60);
+        super(AsteroidsPanel.getWIDTH() / 2, AsteroidsPanel.getHEIGHT() / 2, 0.0, 0, 0, 3);
         this.boost = KeyEvent.VK_W;
         this.left = KeyEvent.VK_A;
         this.right = KeyEvent.VK_D;
         this.bullCounter = 10;
-        this.invinceCounter = 60;
+        this.invinceCounter = 90;
         this.isBoost = false;
+        this.space = false;
     }
 
     public void movePlayer(boolean[] keys) {
         double acc = 1;
         bullCounter--;
+        space =keys[KeyEvent.VK_SPACE];
         int[][] rotatedPoints = rotatePoints(DEFAULT_SHIP, this.angle, this.x, this.y);
-        if (keys[KeyEvent.VK_SPACE] && bullCounter < 0) {
+//        if (keys[KeyEvent.VK_SPACE] && bullCounter < 0) {
+//            AsteroidsPanel.bullets.add(new Bullet(rotatedPoints[0][1], rotatedPoints[1][1], angle, 10));
+//            bullCounter = 10;
+//        }
+        if(oldSpace != space)// && !space)
             AsteroidsPanel.bullets.add(new Bullet(rotatedPoints[0][1], rotatedPoints[1][1], angle, 10));
-            bullCounter = 10;
-        }
         if (keys[this.boost]) {
             this.vx -= acc * getCos(angle);
             this.vy -= acc * getSin(angle);
@@ -50,6 +55,7 @@ public class Player extends SpaceObject {
         this.y += (int) this.vy;
         this.vx += (this.vx > acc / 100) ? -acc / 100 : acc / 100;
         this.vy += (this.vy > acc / 100) ? -acc / 100 : acc / 100;
+        oldSpace = space;
         spaceObjectBoundary();
     }
 

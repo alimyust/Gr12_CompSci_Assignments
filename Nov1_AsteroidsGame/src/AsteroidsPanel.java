@@ -3,12 +3,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
 
 class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, MouseListener {
 
     private static final int WIDTH = 800, HEIGHT = 900, DELAY = 10;
-    private static final int INTRO = 0, GAME = 1, GAMEOVER = 2;
+    private static final int INTRO = 0, GAME = 1, GAMEOVER = 2, SCORE = 3;
     private final boolean PARTICLE = false, LINE = true;
     private int gameState = INTRO;
     private int lives;//{{50,60,40},{50,75,75}};
@@ -24,11 +26,14 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     private final ArrayList<Meteoroid> meteors;
     public static ArrayList<Bullet> bullets;
     private final ArrayList<UFO> ufos;
-    private final int[] PLAYGAME_RECT = {WIDTH / 2 - 125, HEIGHT / 2, 250, 50};
+    private final int[] PLAYGAME_RECT = {WIDTH / 2 - 125, HEIGHT / 2+20, 250, 50};
     private final int[] TITLE_RECT = {WIDTH / 2 - 260, HEIGHT / 2 - 150, 520, 75};
-    private final int[] GAMEOVER_RECT = {WIDTH / 2 - 170, HEIGHT / 2-100, 350, 50};
-    private final int[] SCORE_RECT = {WIDTH / 2 - 90, HEIGHT / 2+50, 180, 50};
-    private final int[] MENU_RECT = {WIDTH / 2 - 55, HEIGHT / 2+130, 110, 50};
+    private final int[] GAMEOVER_RECT = {WIDTH / 2 - 170, HEIGHT / 2 - 100, 350, 50};
+    private final int[] SCORE_RECT = {WIDTH / 2 - 90, HEIGHT / 2 + 70, 180, 50};
+    private final int[] TOPSCORE_RECT = {WIDTH / 2 - 14, HEIGHT / 2 + 70, 28, 50};
+
+    private final int[] MENU_RECT = {WIDTH / 2 - 55, HEIGHT / 2 + 130, 110, 50};
+    private final int[] SCORE_MENU_RECT = {WIDTH / 2 - 55, HEIGHT-200, 110, 50};
 
     public AsteroidsPanel() {
         keys = new boolean[KeyEvent.KEY_LAST + 1];
@@ -39,8 +44,8 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         dustParticles = new ArrayList<DustParticles>();
         ufos = new ArrayList<UFO>();
 
-        lvl = 3;
-        lives = 1;
+        lvl = 1;
+        lives = 3;
         score = 0;
         pDestroyedCount = 90;
         timer.start();
@@ -61,7 +66,10 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         spawnUFO();
         move();
         repaint();
+        if (pDestroyedCount < 90)
+            pDestroyedCount--;
     }
+
     private void move() {
         if (pDestroyedCount >= 90)
             p1.movePlayer(keys);
@@ -76,16 +84,19 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     }
 
     public void paint(Graphics g) {
-        switch (gameState){
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, WIDTH, HEIGHT);
+        for (Meteoroid j : meteors)
+            j.drawMeteoroid(g);
+        switch (gameState) {
             case INTRO -> drawIntro(g);
             case GAME -> drawGame(g);
             case GAMEOVER -> drawGameOver(g);
+            case SCORE -> drawScore(g);
         }
     }
 
     private void drawIntro(Graphics g) {
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, WIDTH, HEIGHT);
         g.setColor(Color.WHITE);
         g.setFont(new Font("Hyperspace", Font.BOLD, 90));
         g.drawString("ASTEROIDS", TITLE_RECT[0], TITLE_RECT[1] + TITLE_RECT[3]);
@@ -93,14 +104,11 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         g.setFont(new Font("Hyperspace", Font.BOLD, 45));
         g.drawString("PLAY GAME", PLAYGAME_RECT[0], PLAYGAME_RECT[1] + PLAYGAME_RECT[3]);
 //        g.drawRect(PLAYGAME_RECT[0], PLAYGAME_RECT[1], PLAYGAME_RECT[2], PLAYGAME_RECT[3]);
-        for (Meteoroid j : meteors)
-            j.drawMeteoroid(g);
+        g.drawString("SCORES", SCORE_RECT[0], SCORE_RECT[1] + SCORE_RECT[3]);
+//            g.drawRect(SCORE_RECT[0],SCORE_RECT[1],SCORE_RECT[2],SCORE_RECT[3]);
     }
-    private void drawGame(Graphics g){
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, WIDTH, HEIGHT);
-        for (Meteoroid j : meteors)
-            j.drawMeteoroid(g);
+
+    private void drawGame(Graphics g) {
         for (DustParticles j : dustParticles)
             j.drawDust(g);
         if (pDestroyedCount >= 90)
@@ -115,36 +123,46 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         g.drawString("Score: " + score, 30, 40);
     }
 
-    private void drawGameOver(Graphics g){
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, WIDTH, HEIGHT);
-        for (Meteoroid j : meteors)
-            j.drawMeteoroid(g);
+    private void drawGameOver(Graphics g) {
         for (DustParticles j : dustParticles)
             j.drawDust(g);
         if (pDestroyedCount >= 90)
             p1.draw(g);
         g.setColor(Color.WHITE);
         g.setFont(new Font("Hyperspace", Font.BOLD, 60));
-        g.drawString("GAME OVER", GAMEOVER_RECT[0],GAMEOVER_RECT[1] + GAMEOVER_RECT[3]);
+        g.drawString("GAME OVER", GAMEOVER_RECT[0], GAMEOVER_RECT[1] + GAMEOVER_RECT[3]);
 //            g.drawRect(GAMEOVER_RECT[0],GAMEOVER_RECT[1],GAMEOVER_RECT[2],GAMEOVER_RECT[3]);
         g.setFont(new Font("Hyperspace", Font.BOLD, 45));
-        g.drawString("Score:" + score, SCORE_RECT[0]-(score + "").length()*14, SCORE_RECT[1] + SCORE_RECT[3]);
+        g.drawString("Score:" + score, SCORE_RECT[0] - (score + "").length() * 14, SCORE_RECT[1] + SCORE_RECT[3]);
 //            g.drawRect(SCORE_RECT[0],SCORE_RECT[1],SCORE_RECT[2],SCORE_RECT[3]);
-        g.drawString("MENU", MENU_RECT[0],MENU_RECT[1]+MENU_RECT[3]);
+        g.drawString("MENU", MENU_RECT[0], MENU_RECT[1] + MENU_RECT[3]);
 //            g.drawRect(MENU_RECT[0],MENU_RECT[1],MENU_RECT[2],MENU_RECT[3]);
+    }
+    private void drawScore(Graphics g) {
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Hyperspace", Font.BOLD, 45));
+        g.drawString("MENU", SCORE_MENU_RECT[0], SCORE_MENU_RECT[1] + SCORE_MENU_RECT[3]);
+//        g.drawRect(SCORE_MENU_RECT[0],SCORE_MENU_RECT[1],SCORE_MENU_RECT[2],SCORE_MENU_RECT[3]);
+        for(int i = 0; i < 5; i++){
+
+            ArrayList<Integer> currScore = orderedScores();
+            currScore.sort(Comparator.reverseOrder());
+            g.drawString(currScore, TOPSCORE_RECT[0] - currScore.length() * 10,
+                    TOPSCORE_RECT[1] + TOPSCORE_RECT[3]+ i*(TOPSCORE_RECT[3] + 5)-200);
+//            g.drawRect(TOPSCORE_RECT[0],TOPSCORE_RECT[1] + i*(TOPSCORE_RECT[3] + 5)-200,TOPSCORE_RECT[2],TOPSCORE_RECT[3]);
+        }
+
     }
 
 
     public void spawnMeteoroids() {
-        if (pDestroyedCount < 90)
-            pDestroyedCount--;
         if (meteors.isEmpty()) {
             lvl++;
             for (int i = 0; i < lvl; i++)
                 meteors.add(new Meteoroid(getMeteorRange(WIDTH), getMeteorRange(HEIGHT), 2, newAngle()));
         }
     }
+
     private void spawnUFO() {
         if (Math.random() * 10000 < lvl && ufos.isEmpty())
             ufos.add(new UFO(getMeteorRange(WIDTH), getMeteorRange(HEIGHT),
@@ -166,15 +184,16 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
             meteors.removeIf(m -> isCircleCollision(m, b));
             ufos.forEach(u -> spaceObjectDestroyed(b, u, 100));
             ufos.removeIf(u -> isCircleCollision(u, b));
-            if (isCircleCollision(p1, b) && b.getBullDecay() < 20 && p1.getInvinceCounter() < 0)
+            if (isCircleCollision(p1, b) && b.getBullDecay() <60 && p1.getInvinceCounter() < 0)
                 playerDestroyed();
         });
         bullets.removeIf(b -> b.getBullDecay() < 0);
         bullets.removeIf(b -> isCircleCollision(p1, b) && b.getBullDecay() < 35);
-        dustParticles.removeIf(DustParticles::getTime);
         for (Meteoroid m : meteors)
-            if (m.getRect().intersects(p1.playerRect()) && p1.getInvinceCounter() < 0 && pDestroyedCount >= 90)
+//            if (m.getRect().intersects(p1.playerRect()) && p1.getInvinceCounter() < 0 && pDestroyedCount >= 90)
+            if (isCircleCollision(p1,m)&& p1.getInvinceCounter() < 0 && pDestroyedCount >= 90)
                 playerDestroyed();
+        dustParticles.removeIf(DustParticles::getTime);
         bullets.removeAll(oldB);
         meteors.removeAll(oldM);
         if (!oldM.isEmpty() && oldM.get(0).getSize() > 0) {
@@ -186,14 +205,15 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     }
 
     private void newPlayer() {
-        if (lives == 0 && pDestroyedCount < 0) {
+        if (lives <= 0 && pDestroyedCount < 0) {
             gameState = GAMEOVER;
             addScore(String.valueOf(score));
+            System.out.println(orderedScores());
         }
         if (lives > 0 && pDestroyedCount < 0) {
             p1 = new Player();
             pDestroyedCount = 90;
-            p1.setInvinceCounter(60);
+            p1.setInvinceCounter(90);
         }
 
     }
@@ -221,13 +241,10 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     }
 
     private boolean isCircleCollision(SpaceObject a, SpaceObject b) {
-        int ax = a.getX();
-        int ay = a.getY();
-        int bx = b.getX();
-        int by = b.getY();
-        int radiusSum = a.wid + b.wid;
-        double distSquared = Math.pow((bx - ax), 2) + Math.pow((by - ay), 2);
-        return distSquared < Math.pow(radiusSum, 2);
+        double xDif = b.getX() - a.getX();
+        double yDif = b.getY() - a.getY();
+        double distanceSquared = xDif * xDif + yDif * yDif;
+        return distanceSquared < (a.wid + b.wid) * (a.wid + b.wid);
     }
 
     private void drawLifeIcon(Graphics g) {
@@ -242,7 +259,8 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
 
     public int getMeteorRange(int dir) {
         int xMeteorRange;
-        do {xMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getX() - 200) : p1.getX() + 200 + Math.random() * dir);
+        do {
+            xMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getX() - 200) : p1.getX() + 200 + Math.random() * dir);
         } while (!(xMeteorRange < 0 || xMeteorRange > dir));
         return xMeteorRange;
     }
@@ -271,16 +289,24 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (inRect(getMousePosition().getLocation(), PLAYGAME_RECT) && gameState == INTRO)
+        Point mousePos = getMousePosition().getLocation();
+        if (inRect(mousePos, PLAYGAME_RECT) && gameState == INTRO)
             gameState = GAME;
-        if (inRect(getMousePosition().getLocation(), MENU_RECT)&& gameState == GAMEOVER) {
+        if(inRect(mousePos, SCORE_RECT) && gameState == INTRO)
+            gameState = SCORE;
+        if(inRect(mousePos, SCORE_MENU_RECT)&&gameState == SCORE)
             gameState = INTRO;
-            p1 = new Player();
-            meteors.clear();
-            ufos.clear();
-            score = 0;
-            lives = 3;
-        }
+        if (inRect(mousePos, MENU_RECT) && gameState == GAMEOVER)
+            resetGame();
+    }
+    private void resetGame(){
+        gameState = INTRO;
+        p1 = new Player();
+        meteors.clear();
+        ufos.clear();
+        score = 0;
+        lives = 3;
+        lvl=1;
     }
 
     private boolean inRect(Point p, int[] arr) {
@@ -311,15 +337,32 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     public void mouseExited(MouseEvent e) {
 
     }
-    private void addScore( String content) {
+
+    private void addScore(String content) {
+        // Create a FileWriter object with the specified file path
         try {
-            // Create a FileWriter object with the specified file path
-            PrintWriter fileOut = new PrintWriter(new BufferedWriter(new FileWriter("scores.txt",true)));
+            PrintWriter fileOut = new PrintWriter(new BufferedWriter(new FileWriter("scores.txt", true)));
             fileOut.println(content);
             fileOut.close();
             System.out.println("Content has been written to the file.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private ArrayList<Integer> orderedScores() {
+        Scanner fileIn = null;
+        try {
+            fileIn = new Scanner(new FileReader(new File("scores.txt")));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        ArrayList<Integer> arrOut = new ArrayList<>();
+        while (fileIn.hasNextInt())
+            arrOut.add(fileIn.nextInt());
+        fileIn.close();
+//        Collections.sort(arrOut);
+//        System.out.println(arrOut);
+        return arrOut;
     }
 }

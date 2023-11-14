@@ -27,10 +27,10 @@ public class UFO extends SpaceObject{
     private void ufoShoot(Player p1){
         bullCounter++;
         double shootingAngle = Math.atan2((p1.getY() - y),(p1.getX()-x ));// Math.PI/2;
-        if(bullCounter % 100 == 0 && isInBounds())
+        if(bullCounter % 100 == 0 && isInBounds()) // prevents UFOs sniping you from offscreen
             AsteroidsPanel.bullets.add(new Bullet( x+(int) ((double)wid*1.5*Math.cos(shootingAngle)),
-                    y+(int) ((double)wid*1.5*Math.sin(shootingAngle)),
-                    Math.toDegrees(shootingAngle + Math.PI) +Math.random()*90-45,5));
+        y+(int) ((double)wid*1.5*Math.sin(shootingAngle)),
+        Math.toDegrees(shootingAngle + Math.PI) +Math.random()*90-45,5));
 //
     }
     private boolean isInBounds(){

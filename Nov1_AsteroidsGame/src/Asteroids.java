@@ -4,7 +4,6 @@ public class Asteroids extends JFrame{
      AsteroidsPanel asteroidsPanel = new AsteroidsPanel();
 
     public Asteroids() {
-        super("Asteroids");
         add(asteroidsPanel);
         setSize(800,900);
 //        pack();
