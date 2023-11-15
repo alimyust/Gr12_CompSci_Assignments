@@ -11,11 +11,13 @@ public class Player extends SpaceObject {
     private int invinceCounter;
     private boolean isBoost;
     private final double[][] DEFAULT_SHIP = new double[][]{
-            {30, -30, 30, 20, 20,35,20,35,20,20}, {-15, 0, 15, 12, -12,-6,0,6,12,-12}};
-private boolean oldSpace;
-private boolean space;
+            {30, -30, 30, 20, 20, 35, 20, 35, 20, 20}, {-15, 0, 15, 12, -12, -6, 0, 6, 12, -12}};
+    private boolean oldSpace;
+    private boolean space;
+    private final Music fireSound = new Music();
+
     public Player() {
-        super(AsteroidsPanel.getWIDTH() / 2, AsteroidsPanel.getHEIGHT() / 2, 0.0, 0, 0, 3);
+        super(AsteroidsPanel.getWIDTH() / 2, AsteroidsPanel.getHEIGHT() / 2, 0.0, 0, 0, 9);
         this.boost = KeyEvent.VK_W;
         this.left = KeyEvent.VK_A;
         this.right = KeyEvent.VK_D;
@@ -28,24 +30,32 @@ private boolean space;
     public void movePlayer(boolean[] keys) {
         double acc = 1;
         bullCounter--;
-        space =keys[KeyEvent.VK_SPACE];
+        space = keys[KeyEvent.VK_SPACE];
         int[][] rotatedPoints = rotatePoints(DEFAULT_SHIP, this.angle, this.x, this.y);
 //        if (keys[KeyEvent.VK_SPACE] && bullCounter < 0) {
 //            AsteroidsPanel.bullets.add(new Bullet(rotatedPoints[0][1], rotatedPoints[1][1], angle, 10));
 //            bullCounter = 10;
 //        }
-        if(oldSpace != space)// && !space)
+        if (oldSpace != space) {// && !space){
             AsteroidsPanel.bullets.add(new Bullet(rotatedPoints[0][1], rotatedPoints[1][1], angle, 10));
+            fireSound.setFile("sound/fire.wav");
+            fireSound.play();
+        }
         if (keys[this.boost]) {
+            final Music thrustSound = new Music();
+            thrustSound.setFile("sound/thrust.wav");
+            thrustSound.play();
             this.vx -= acc * getCos(angle);
             this.vy -= acc * getSin(angle);
             this.isBoost = true;
-        } else {this.isBoost = false;}
+        } else {
+            this.isBoost = false;
+        }
         if (keys[this.left])
-            this.angle -= 3;
+            this.angle -= 6;
         if (keys[this.right])
-            this.angle += 3;
-        int maxSpeed = 3;
+            this.angle += 6;
+        int maxSpeed = 4;
         if (Math.abs(this.vy) > maxSpeed)
             this.vy = (this.vy > 0) ? maxSpeed : -maxSpeed;
         if (Math.abs(this.vx) > maxSpeed)//speed limit
@@ -69,12 +79,12 @@ private boolean space;
         int[][] rotatedPoints = rotatePoints(DEFAULT_SHIP, this.angle, this.x, this.y);
         g.setColor(Color.WHITE);
         if (invinceCounter < 0 || invinceCounter % 10 == 0) {
-            if(this.isBoost && bullCounter % 5 == 0)
+            if (this.isBoost && bullCounter % 5 == 0)
                 g.drawPolygon(rotatedPoints[0], rotatedPoints[1], 10);
             else
                 g.drawPolygon(rotatedPoints[0], rotatedPoints[1], 5);
         }
-//        g.drawOval(this.x-this.wid/2,this.y-this.wid/2,this.wid,this.wid);
+        g.drawOval(this.x-this.wid/2,this.y-this.wid/2,this.wid,this.wid);
 //        g.setColor(Color.RED);
 //        g.drawRect(x-wid/2,y-wid/2,wid,wid);
     }

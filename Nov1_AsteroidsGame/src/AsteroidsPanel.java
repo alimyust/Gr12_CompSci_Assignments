@@ -3,31 +3,43 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
+/*
+* Main game logic is contained here
+* Responsible for calling the methods of all of the different objects to check for collision and
+* remove objects based on the result, paint, play sounds, etc.
+* */
 
 class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, MouseListener {
 
     private static final int WIDTH = 800, HEIGHT = 900, DELAY = 10;
+    //Variables for gamestates and constants that make the code more readable
     private static final int INTRO = 0, GAME = 1, GAMEOVER = 2, SCORE = 3;
     private final boolean PARTICLE = false, LINE = true;
-    private boolean isHighScore = false;
+
+
     private int gameState = INTRO;
+    //main game control variable
     private int lives;//{{50,60,40},{50,75,75}};
     private final int[][] lifeIcon = {{40, 50, 60, 58, 42}, {75, 50, 75, 71, 71}};
+    //the sets of points the drawPolygon method would use to draw icons
     private int score;
     private int lvl; //amount of meteors
     private int pDestroyedCount;
-    private int highScoreCount;
+    //counter tied to play that controls when the player is shown after being destroyed
+    private int count;
+    //general count variable
     private final boolean[] keys;
     static Timer timer;
     Player p1;
 
+    //Arraylists that will contain all the different objects related to the game
     private final ArrayList<DustParticles> dustParticles;
     private final ArrayList<Meteoroid> meteors;
     public static ArrayList<Bullet> bullets;
     private final ArrayList<UFO> ufos;
+    //Rects that are centered and are used to draw text that is also centered
     private final int[] PLAYGAME_RECT = {WIDTH / 2 - 125, HEIGHT / 2+20, 250, 50};
     private final int[] TITLE_RECT = {WIDTH / 2 - 260, HEIGHT / 2 - 150, 520, 75};
     private final int[] GAMEOVER_RECT = {WIDTH / 2 - 170, HEIGHT / 2 - 100, 350, 50};
@@ -38,21 +50,22 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     private final int[] SCORE_MENU_RECT = {WIDTH / 2 - 55, HEIGHT-200, 110, 50};
     private final int[] HIGHSCORE_RECT = {WIDTH / 2 - 183, HEIGHT/2, 366, 40};
 
-
+private final Music slowBeat = new Music();
+    private final Music fastBeat = new Music();
     public AsteroidsPanel() {
         keys = new boolean[KeyEvent.KEY_LAST + 1];
         timer = new Timer(DELAY, this);//Listens to this panel (makes loop)
-        p1 = new Player();
+        p1 = new Player(); //init
         meteors = new ArrayList<Meteoroid>();
         bullets = new ArrayList<Bullet>();
         dustParticles = new ArrayList<DustParticles>();
         ufos = new ArrayList<UFO>();
 
         lvl = 3;
-        lives = 1;
+        lives = 3;
         score = 0;
         pDestroyedCount = 90;
-        highScoreCount = 0;
+        count = 0;
         timer.start();
 
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -63,14 +76,18 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     }
 
     public void actionPerformed(ActionEvent e) {
+        //Main game function that controls what is happening at a given time
+        //Some methods separated for when the game actually starts
         if (gameState == GAME) {
             collision();
             spawnUFO();
+            heartBeat();
         }
         spawnMeteoroids();
-        spawnUFO();
+        spawnUFO(); //for visuals in the background
         move();
         repaint();
+        count ++;
         if (pDestroyedCount < 90)
             pDestroyedCount--;
     }
@@ -92,10 +109,10 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, WIDTH, HEIGHT);
         for (Meteoroid j : meteors)
-            j.drawMeteoroid(g);
+            j.drawMeteoroid(g); // things that are always drawn
         for (DustParticles j : dustParticles)
             j.drawDust(g);
-        switch (gameState) {
+        switch (gameState) { // switch statement to what is drawn
             case INTRO -> drawIntro(g);
             case GAME -> drawGame(g);
             case GAMEOVER -> drawGameOver(g);
@@ -104,8 +121,10 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     }
 
     private void drawIntro(Graphics g) {
-        g.setColor(Color.WHITE);
+        g.setColor(Color.WHITE); // set font as hyperspace which is separate from the imported fonts
+        // (installer included)
         g.setFont(new Font("Hyperspace", Font.BOLD, 90));
+        //rects are placed in a way
         g.drawString("ASTEROIDS", TITLE_RECT[0], TITLE_RECT[1] + TITLE_RECT[3]);
 //        g.drawRect(TITLE_RECT[0], TITLE_RECT[1], TITLE_RECT[2], TITLE_RECT[3]);
         g.setFont(new Font("Hyperspace", Font.BOLD, 45));
@@ -129,8 +148,7 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     }
 
     private void drawGameOver(Graphics g) {
-        highScoreCount ++;
-        highScoreCount = (Math.abs(highScoreCount) == 50)?-highScoreCount: highScoreCount;
+        count = (Math.abs(count) == 50)?-count: count;
 //        if (pDestroyedCount >= 90)
 //            p1.draw(g);
         g.setColor(Color.WHITE);
@@ -142,11 +160,12 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
 //            g.drawRect(SCORE_RECT[0],SCORE_RECT[1],SCORE_RECT[2],SCORE_RECT[3]);
         g.drawString("MENU", MENU_RECT[0], MENU_RECT[1] + MENU_RECT[3]);
 //            g.drawRect(MENU_RECT[0],MENU_RECT[1],MENU_RECT[2],MENU_RECT[3]);
-        if(orderedScores().size() > 1 && (orderedScores().get(1) < score && highScoreCount >0)){
+        if(orderedScores().size() > 1 && (orderedScores().get(1) < score && count >0)){
             g.drawString("NEW HIGHSCORE", HIGHSCORE_RECT[0], HIGHSCORE_RECT[1] + HIGHSCORE_RECT[3]);
 //            g.drawRect(HIGHSCORE_RECT[0],HIGHSCORE_RECT[1],HIGHSCORE_RECT[2],HIGHSCORE_RECT[3]);
         }
     }
+
     private void drawScore(Graphics g) {
         g.setColor(Color.WHITE);
         g.setFont(new Font("Hyperspace", Font.BOLD, 45));
@@ -160,7 +179,6 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         }
 
     }
-
 
     public void spawnMeteoroids() {
         if (meteors.isEmpty()) {
@@ -186,9 +204,9 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
                     .forEach(m -> {
                         oldM.add(m);
                         oldB.add(b);
+                        m.getMusic().play();
                     });
             meteors.forEach(m -> spaceObjectDestroyed(b, m, 5 * lvl + m.getSize() + 1));
-            meteors.removeIf(m -> isCircleCollision(m, b));
             ufos.forEach(u -> spaceObjectDestroyed(b, u, 100));
             ufos.removeIf(u -> isCircleCollision(u, b));
             if (isCircleCollision(p1, b) && b.getBullDecay() <60 && p1.getInvinceCounter() < 0)
@@ -251,6 +269,18 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
         double yDif = b.getY() - a.getY();
         double distanceSquared = xDif * xDif + yDif * yDif;
         return distanceSquared < (a.wid + b.wid) * (a.wid + b.wid);
+    }
+
+    private void heartBeat() {
+        if(count % 60 == 0 && lives > 1){
+            // Audio seems to glitch if file is previously set before playing
+            slowBeat.setFile("sound/beat1.wav");
+            slowBeat.play();
+        } // plays a different beat depending on lives
+        if(count % 30 == 0 && lives == 1){
+            fastBeat.setFile("sound/beat2.wav");
+            fastBeat.play();
+        }
     }
 
     private void drawLifeIcon(Graphics g) {

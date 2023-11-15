@@ -14,13 +14,17 @@ public class Meteoroid extends SpaceObject{
             {{-24, 30, 41, 14, 18, -14, -32, -45, -19}, {-31, -30, -1, 34, 8, 15, 23, -8, -10}},
             {{-4, 37, 34, -2, 27, -12, -41, -44, -21, -27}, {-46, -14, 17, 18, 37, 40, 24, -7, -8, -36}},
             {{-22, -35, -36, -25, -25, -12, -10, 0, 1, 13, 12, -6, -8, 9, 13, 10, 2, -19, -21, -24}, {-19, -19, 10, 10, 32, 33, 17, 18, 28, 28, -22, -20, -34, -36, -23, -36, -44, -43, -20, 11}}
-
     };
+    private final Music[] bangSounds ={new Music(),new Music(),new Music()};
+
     public Meteoroid(int x, int y, int size, double angle) {
         super(x,y,WID[size], angle);
         this.size = size;
         this.rotSpeed = Math.random()+5;
         this.rotCount = 1;
+        this.bangSounds[2].setFile("sound/bangLarge.wav");
+        this.bangSounds[1].setFile("sound/bangMedium.wav");
+        this.bangSounds[0].setFile("sound/bangSmall.wav");
         double[][] BIG_PTS = POT_PTS[(int) (Math.random()* POT_PTS.length)];
         double[][] MED_PTS = new double[2][BIG_PTS[0].length];
         double[][] SML_PTS = new double[2][BIG_PTS[0].length];
@@ -50,4 +54,5 @@ public class Meteoroid extends SpaceObject{
         return size;
     }
 
+    public Music getMusic(){return bangSounds[size];}
 }
