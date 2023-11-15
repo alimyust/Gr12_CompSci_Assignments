@@ -13,7 +13,6 @@ public class Asteroids extends JFrame{
     }
 
     public static void main(String[] args) {
-        System.setProperty("jna.library.path", "Nov1_AsteroidsGame/src/lib");
         new Asteroids();
     }
 }
