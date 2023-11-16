@@ -1,5 +1,6 @@
 import java.awt.*;
-
+//Bullets class that inherits from spaceObj
+//has a set constant velocity (speed) and a limted lifespan (decay)
 public class Bullet extends SpaceObject{
     private int bullDecay;
 
@@ -13,7 +14,7 @@ public class Bullet extends SpaceObject{
         g.setColor(Color.RED);
         g.drawOval(this.getX(),this.getY(),this.wid,this.wid);
     }
-
+    //getter to remove bullet when it is less than zero
     public int getBullDecay() {
         return bullDecay;
     }

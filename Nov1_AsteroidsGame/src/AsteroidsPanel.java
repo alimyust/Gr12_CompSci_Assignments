@@ -1,3 +1,5 @@
+import org.lwjgl.Sys;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -44,6 +46,7 @@ class AsteroidsPanel extends JPanel implements KeyListener, ActionListener, Mous
     private final int[] TITLE_RECT = {WIDTH / 2 - 260, HEIGHT / 2 - 150, 520, 75};
     private final int[] GAMEOVER_RECT = {WIDTH / 2 - 170, HEIGHT / 2 - 100, 350, 50};
     private final int[] SCORE_RECT = {WIDTH / 2 - 90, HEIGHT / 2 + 70, 180, 50};
+    private final int[] EXIT_RECT = {WIDTH / 2 - 55, HEIGHT / 2 + 120, 110, 50};
     private final int[] TOPSCORE_RECT = {WIDTH / 2 - 14, HEIGHT / 2 + 70, 28, 50};
 
     private final int[] MENU_RECT = {WIDTH / 2 - 55, HEIGHT / 2 + 130, 110, 50};
@@ -78,23 +81,28 @@ private final Music slowBeat = new Music();
     public void actionPerformed(ActionEvent e) {
         //Main game function that controls what is happening at a given time
         //Some methods separated for when the game actually starts
+        count ++;
         if (gameState == GAME) {
             collision();
             spawnUFO();
             heartBeat();
         }
         spawnMeteoroids();
-        spawnUFO(); //for visuals in the background
+        spawnUFO();
         move();
         repaint();
-        count ++;
         if (pDestroyedCount < 90)
             pDestroyedCount--;
+        //To control how the player doesn't spawn back immediately after being destroyed. It also acts as a boolean
+        //as well. When pDesCount >= 90 then the player is in normal game mode. When the player is destroyed pDesCount
+        //is subtracted once which causes this to be true to let it approach zero. When it gets there it's set to 90
+        //again and everything is reset.
     }
 
     private void move() {
+        //calls the move method for each object
         if (pDestroyedCount >= 90)
-            p1.movePlayer(keys);
+            p1.movePlayer(keys); // only move the player if they are in the playable state : pDestroyedCount >= 90
         for (Meteoroid j : meteors)
             j.moveSpaceObject();
         for (Bullet j : bullets)
@@ -124,7 +132,7 @@ private final Music slowBeat = new Music();
         g.setColor(Color.WHITE); // set font as hyperspace which is separate from the imported fonts
         // (installer included)
         g.setFont(new Font("Hyperspace", Font.BOLD, 90));
-        //rects are placed in a way
+        //Rect is drawn while centered, and then the text is drawn in the same space which makes it appear centered.
         g.drawString("ASTEROIDS", TITLE_RECT[0], TITLE_RECT[1] + TITLE_RECT[3]);
 //        g.drawRect(TITLE_RECT[0], TITLE_RECT[1], TITLE_RECT[2], TITLE_RECT[3]);
         g.setFont(new Font("Hyperspace", Font.BOLD, 45));
@@ -132,23 +140,25 @@ private final Music slowBeat = new Music();
 //        g.drawRect(PLAYGAME_RECT[0], PLAYGAME_RECT[1], PLAYGAME_RECT[2], PLAYGAME_RECT[3]);
         g.drawString("SCORES", SCORE_RECT[0], SCORE_RECT[1] + SCORE_RECT[3]);
 //            g.drawRect(SCORE_RECT[0],SCORE_RECT[1],SCORE_RECT[2],SCORE_RECT[3]);
+        g.drawString("EXIT", EXIT_RECT[0],EXIT_RECT[1]+EXIT_RECT[3]);
+//        g.drawRect(EXIT_RECT[0],EXIT_RECT[1],EXIT_RECT[2],EXIT_RECT[3]);
     }
 
     private void drawGame(Graphics g) {
         if (pDestroyedCount >= 90)
-            p1.draw(g);
+            p1.draw(g); // only draw player when the ship hasn't been destroyed
         for (Bullet j : bullets)
             j.drawBullet(g);
         for (UFO j : ufos)
             j.drawUFO(g, p1);
-        drawLifeIcon(g);
+        drawLifeIcon(g); // method to draw life icons
         g.setColor(Color.WHITE);
         g.setFont(new Font("Hyperspace", Font.BOLD, 30));
         g.drawString("Score: " + score, 30, 40);
     }
 
     private void drawGameOver(Graphics g) {
-        count = (Math.abs(count) == 50)?-count: count;
+        count = (Math.abs(count) % 50 == 0)?-count: count;
 //        if (pDestroyedCount >= 90)
 //            p1.draw(g);
         g.setColor(Color.WHITE);
@@ -161,6 +171,7 @@ private final Music slowBeat = new Music();
         g.drawString("MENU", MENU_RECT[0], MENU_RECT[1] + MENU_RECT[3]);
 //            g.drawRect(MENU_RECT[0],MENU_RECT[1],MENU_RECT[2],MENU_RECT[3]);
         if(orderedScores().size() > 1 && (orderedScores().get(1) < score && count >0)){
+            //if the highest previous score is less then the current score start flashing new highscore
             g.drawString("NEW HIGHSCORE", HIGHSCORE_RECT[0], HIGHSCORE_RECT[1] + HIGHSCORE_RECT[3]);
 //            g.drawRect(HIGHSCORE_RECT[0],HIGHSCORE_RECT[1],HIGHSCORE_RECT[2],HIGHSCORE_RECT[3]);
         }
@@ -171,8 +182,8 @@ private final Music slowBeat = new Music();
         g.setFont(new Font("Hyperspace", Font.BOLD, 45));
         g.drawString("MENU", SCORE_MENU_RECT[0], SCORE_MENU_RECT[1] + SCORE_MENU_RECT[3]);
 //        g.drawRect(SCORE_MENU_RECT[0],SCORE_MENU_RECT[1],SCORE_MENU_RECT[2],SCORE_MENU_RECT[3]);
-        for(int i = 0; i < (Math.min(orderedScores().size(), 5)); i++){
-            String currScore = orderedScores().get(i) + "";
+        for(int i = 0; i < (Math.min(orderedScores().size(), 5)); i++){ //only displays amount of scores until there are 5
+            String currScore = orderedScores().get(i) + ""; // gets the top 5 values and displays them
             g.drawString(currScore, TOPSCORE_RECT[0] - currScore.length() * 10,
                     TOPSCORE_RECT[1] + TOPSCORE_RECT[3]+ i*(TOPSCORE_RECT[3] + 5)-200);
 //            g.drawRect(TOPSCORE_RECT[0],TOPSCORE_RECT[1] + i*(TOPSCORE_RECT[3] + 5)-200,TOPSCORE_RECT[2],TOPSCORE_RECT[3]);
@@ -182,7 +193,7 @@ private final Music slowBeat = new Music();
 
     public void spawnMeteoroids() {
         if (meteors.isEmpty()) {
-            lvl++;
+            lvl++; // if meteors list is empty 1 more is spawned
             for (int i = 0; i < lvl; i++)
                 meteors.add(new Meteoroid(getMeteorRange(WIDTH), getMeteorRange(HEIGHT), 2, newAngle()));
         }
@@ -190,43 +201,57 @@ private final Music slowBeat = new Music();
 
     private void spawnUFO() {
         if (Math.random() * 10000 < lvl && ufos.isEmpty())
+            //random chance for ufo to spawn increasing per lvl
             ufos.add(new UFO(getMeteorRange(WIDTH), getMeteorRange(HEIGHT),
                     (int) (Math.random() * 2), newAngle()));
     }
 
     public void collision() {
-        // Arraylist to gather all meteors to remove
+        //Method that does all collision calculations and removes unnecessary things from the arraylists
         ArrayList<Meteoroid> oldM = new ArrayList<>();
         ArrayList<Bullet> oldB = new ArrayList<>();
-        bullets.forEach(b -> {
+        bullets.forEach(b -> { // a lambda function that evaluates collisions for bullets and other objects
             meteors.stream()
                     .filter(m -> isCircleCollision(m, b))
-                    .forEach(m -> {
-                        oldM.add(m);
-                        oldB.add(b);
+                    .forEach(m -> { // filter all meteors that have a collision with a bullet
+                        oldB.add(b); //add to temporary lists to prevent concurrent modification error
+                        oldM.add(m);//that happens when b and m are removed directly
+                        spaceObjectDestroyed(b, m, 5 * lvl + m.getSize() + 1);
+                        //for each meteor, m, if it's destroyed add score depending on size and level
                         m.getMusic().play();
                     });
-            meteors.forEach(m -> spaceObjectDestroyed(b, m, 5 * lvl + m.getSize() + 1));
             ufos.forEach(u -> spaceObjectDestroyed(b, u, 100));
-            ufos.removeIf(u -> isCircleCollision(u, b));
+            ufos.removeIf(u -> isCircleCollision(u, b)&&b.getBullDecay() <60);
+            // removes ufo is they intersect with bullets and there has been enough delay
             if (isCircleCollision(p1, b) && b.getBullDecay() <60 && p1.getInvinceCounter() < 0)
-                playerDestroyed();
+                playerDestroyed(); // if player isn't invincible and bullets are past their "buffer time"
         });
         bullets.removeIf(b -> b.getBullDecay() < 0);
         bullets.removeIf(b -> isCircleCollision(p1, b) && b.getBullDecay() < 35);
-        for (Meteoroid m : meteors)
-//            if (m.getRect().intersects(p1.playerRect()) && p1.getInvinceCounter() < 0 && pDestroyedCount >= 90)
-            if (isCircleCollision(p1,m)&& p1.getInvinceCounter() < 0 && pDestroyedCount >= 90)
+        for (Meteoroid meteor : meteors) {
+            //if for any meteor that collides with player = true and player can be destroyed, it is
+            if (isCircleCollision(p1, meteor) && p1.getInvinceCounter() < 0 && pDestroyedCount >= 90) {
                 playerDestroyed();
+                break; // breaks after player destroyed
+            }
+        }
+        for (UFO ufo : ufos) {
+            //if for any ufo that collides with player = true and player can be destroyed, it is
+            if (isCircleCollision(p1, ufo) && p1.getInvinceCounter() < 0 && pDestroyedCount >= 90) {
+                playerDestroyed();
+                break; // breaks after player destroyed
+            }
+        }
         dustParticles.removeIf(DustParticles::getTime);
-        bullets.removeAll(oldB);
-        meteors.removeAll(oldM);
+        bullets.removeAll(oldB); // removes dust particles if there time is less than zero (true)
+        meteors.removeAll(oldM); // removes all collected objects from bullets and meteors
         if (!oldM.isEmpty() && oldM.get(0).getSize() > 0) {
             Meteoroid m = oldM.get(0); // ^ If there is something to remove in oldM, and it isn't the smallest size
             meteors.add(new Meteoroid(m.getX(), m.getY(), m.getSize() - 1, newAngle()));
             meteors.add(new Meteoroid(m.getX(), m.getY(), m.getSize() - 1, newAngle()));
         } //^ add 2 meteors with new angles and a smaller size
         newPlayer();
+        //creates a new player when possible
     }
 
     private void newPlayer() {
@@ -235,8 +260,9 @@ private final Music slowBeat = new Music();
             addScore(String.valueOf(score));
         }
         if (lives > 0 && pDestroyedCount < 0) {
-            p1 = new Player();
-            pDestroyedCount = 90;
+            p1 = new Player(); // if still in game then reset player
+            pDestroyedCount = 90; // resets counter to 90 so that the "toggle" for players destroyed state is false;
+            //No actual toggle; it's just controlled by whether pDesCount >= 90 or < 90
             p1.setInvinceCounter(90);
         }
 
@@ -245,6 +271,7 @@ private final Music slowBeat = new Music();
     private void playerDestroyed() {
         lives--;
         pDestroyedCount--;
+        //creates 3 new lines when ship destroyed
         for (int i = 0; i < 3; i++)
             dustParticles.add(new DustParticles((int) (p1.getX() + (Math.random() * 30)),
                     (int) (p1.getY() + (Math.random() * 30)), newAngle(), LINE));
@@ -253,6 +280,8 @@ private final Music slowBeat = new Music();
     private void spaceObjectDestroyed(SpaceObject b, SpaceObject u, int scorePlus) {
         if (isCircleCollision(b, u)) {
             score += scorePlus;
+            //if anything hits anything else, this function adds the dictated score and
+            //creates a bunch of particles
             double newAngle = Math.random() * 360;
             for (int i = 0; i < Math.random() * 5 + 2; i++)
                 dustParticles.add(new DustParticles((int) (u.getX() + (Math.random() * 30)),
@@ -263,8 +292,9 @@ private final Music slowBeat = new Music();
     private double newAngle() {
         return Math.random() * 30 + 30 + (int) (Math.random() * 2) * 90;
     }
-
+    //gets an angle that won't be close to any cardinal directions (to prevent things getting stuck offscreen)
     private boolean isCircleCollision(SpaceObject a, SpaceObject b) {
+        //checks circle collision using general formula
         double xDif = b.getX() - a.getX();
         double yDif = b.getY() - a.getY();
         double distanceSquared = xDif * xDif + yDif * yDif;
@@ -274,11 +304,11 @@ private final Music slowBeat = new Music();
     private void heartBeat() {
         if(count % 60 == 0 && lives > 1){
             // Audio seems to glitch if file is previously set before playing
-            slowBeat.setFile("sound/beat1.wav");
+            slowBeat.setFile("Nov1_AsteroidsGame/sound/beat1.wav");
             slowBeat.play();
         } // plays a different beat depending on lives
         if(count % 30 == 0 && lives == 1){
-            fastBeat.setFile("sound/beat2.wav");
+            fastBeat.setFile("Nov1_AsteroidsGame/sound/beat2.wav");
             fastBeat.play();
         }
     }
@@ -287,24 +317,25 @@ private final Music slowBeat = new Music();
         g.setColor(Color.WHITE);
         for (int i = 0; i < lives; i++) {
             int[] xPts = lifeIcon[0].clone();
+            //only the xPoints change when drawing multiple icons, so those are modified
             for (int j = 0; j < xPts.length; j++)
-                xPts[j] += 25 * i;
+                xPts[j] += 25 * i; // adding 25 as distance between icons
             g.drawPolygon(xPts, lifeIcon[1], 5);
+            // using polygon method to draw using an array of coords as input
         }
     }
 
-    public int getMeteorRange(int dir) {
-        int xMeteorRange;
-        do {
-            xMeteorRange = (int) ((Math.random() > 0.5) ? Math.random() * (p1.getX() - 200) : p1.getX() + 200 + Math.random() * dir);
-        } while (!(xMeteorRange < 0 || xMeteorRange > dir));
-        return xMeteorRange;
+    private int getMeteorRange(int dir) {
+        //Method to get the possible ranges for something to spawn that is out of bounds. Creates the effect that
+        //asteroids are falling into screen instead of just appearing there. Also creates a reason to not camp at the edge
+        //of the screen as asteroids can now spawn right at the edge
+        return(int) ((Math.random() > 0.5) ? Math.random()*-200 : dir+ Math.random() * 200);
     }
 
     public static int getWIDTH() {
         return WIDTH;
     }
-
+    //getters for wid and height to use in other classes. Program should be able to handle all reasonable wid & hgt
     public static int getHEIGHT() {
         return HEIGHT;
     }
@@ -325,7 +356,10 @@ private final Music slowBeat = new Music();
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        //detects if a button is clicked and sets the gameState
         Point mousePos = getMousePosition().getLocation();
+        if(inRect(mousePos, EXIT_RECT) && gameState == INTRO)
+            System.exit(0); // exits if exit is clicked
         if (inRect(mousePos, PLAYGAME_RECT) && gameState == INTRO)
             gameState = GAME;
         if(inRect(mousePos, SCORE_RECT) && gameState == INTRO)
@@ -333,9 +367,11 @@ private final Music slowBeat = new Music();
         if(inRect(mousePos, SCORE_MENU_RECT)&&gameState == SCORE)
             gameState = INTRO;
         if (inRect(mousePos, MENU_RECT) && gameState == GAMEOVER)
-            resetGame();
+            resetGame(); // pressing menu back is the only way to replay
+
     }
     private void resetGame(){
+        //Resets all values to replay the game
         gameState = INTRO;
         p1 = new Player();
         meteors.clear();
@@ -346,6 +382,7 @@ private final Music slowBeat = new Music();
     }
 
     private boolean inRect(Point p, int[] arr) {
+        //checks if the mouse position is inside the button border when it's clicked
         return p.x > arr[0] && p.x < arr[0] + arr[2] &&
                 p.y > arr[1] && p.y < arr[1] + arr[3];
     }
@@ -374,20 +411,19 @@ private final Music slowBeat = new Music();
 
     }
 
-    private void addScore(String content) {
-        // Create a FileWriter object with the specified file path
+    private void addScore(String newScore) {
+
         try {
             PrintWriter fileOut = new PrintWriter(new BufferedWriter(new FileWriter("scores.txt", true)));
-            fileOut.println(content);
+            fileOut.println(newScore); // writes new score to the current file
             fileOut.close();
-            System.out.println("Content has been written to the file.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     private ArrayList<Integer> orderedScores() {
-        //looks at the scores file and returns an ordered arraylist of numbers
+        //looks at the scores file and returns a sorted arraylist of numbers from descending order
         Scanner fileIn;
         try {
             fileIn = new Scanner(new FileReader("scores.txt"));

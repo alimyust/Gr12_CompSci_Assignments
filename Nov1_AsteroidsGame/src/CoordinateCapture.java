@@ -3,6 +3,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
+//Copied from the internet and modified to calculate the point lists for drawing
+//Not really part of project, just a temporary helper file
 
 public class CoordinateCapture extends JFrame implements KeyListener, MouseListener {
     private final List<Integer> xCoordinates = new ArrayList<>();
