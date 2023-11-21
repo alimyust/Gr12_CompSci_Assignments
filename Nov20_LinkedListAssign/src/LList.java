@@ -1,33 +1,19 @@
 public class LList {
     private LNode head;
-    private LNode tail;
 
 
     public LList(){
         head=null;
-        tail = null;
     }
 
     public void add(int n){
-        LNode tmp=new LNode(n,head,tail);
+        LNode tmp=new LNode(n,head);
         head=tmp;
 
     }
     public void push(int n){
-        LNode tmp=new LNode(n,head,tail);
-        tmp.setNext(head);
-        tmp.setPrev(null);
-        if(head != null)
-            head.setPrev(tmp);
+        LNode tmp=new LNode(n,head);
         head = tmp;
-    }
-    public void enqueue(int n){
-        LNode tmp=new LNode(n,head,tail);
-        tmp.setNext(null);
-        tmp.setPrev(tail);
-        if(tail != null)
-            tail.setPrev(tmp);
-        tail = tmp;
     }
     public int pop(){
         int popValue= head.getVal();
