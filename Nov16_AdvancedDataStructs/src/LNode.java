@@ -1,40 +1,43 @@
-
-//List node
 public class LNode {
     private int val;
     private LNode next;
+    private LNode prev;
 
-    public LNode(int val, LNode next) {
-        this.val = val;
-        this.next = next;
+    public LNode(int val,LNode prev, LNode next){
+        this.val=val;
+        this.next=next;
+        this.prev= prev;
+    }
+    public int getVal(){
+        return this.val;
+    }
+    public void setVal(int val){
+        this.val=val;
+    }
+    public LNode getNext(){
+        return this.next;
+    }
+    public void setNext(LNode next){
+        this.next=next;
     }
 
-    public int getVal() {
-        return val;
+    public LNode getPrev() {
+        return prev;
     }
 
-    public LNode getNext() {
-        return next;
+    public void setPrev(LNode prev) {
+        this.prev = prev;
     }
 
-    public void setVal(int val) {
-        this.val = val;
-    }
-
-    public void setNext(LNode next) {
-        this.next = next;
-    }
     public String address(){
-        return "" + this.hashCode();
+        return ""+this.hashCode();
     }
 
-    @Override
-    public String toString() {
-        String ans = "" + this.val;
-        if(this.next == null)
-            ans += ":"+ null;
-        else
-            ans += " :@" + this.next.address();
-        return "<" + ans + ">";
+    public String toString(){
+        String ans=""+this.val;
+        ans += (this.prev == null)?":null":":@"+this.prev.address();
+        ans += (this.next == null)?":null":":@"+this.next.address();
+
+        return "<"+ans+">";
     }
 }
