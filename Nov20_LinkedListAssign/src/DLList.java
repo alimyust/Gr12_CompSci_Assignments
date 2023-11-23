@@ -1,4 +1,3 @@
-import org.lwjgl.Sys;
 
 public class DLList {
     private DNode head;
