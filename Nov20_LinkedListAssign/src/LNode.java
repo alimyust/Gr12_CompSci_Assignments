@@ -2,6 +2,10 @@ public class LNode {
     private int val;
     private LNode next;
 
+    public LNode(int val){
+        this.val = val;
+        this.next = null;
+    }
     public LNode(int val, LNode next) {
         this.val = val;
         this.next = next;

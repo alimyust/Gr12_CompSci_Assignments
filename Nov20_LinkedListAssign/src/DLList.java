@@ -1,3 +1,5 @@
+import org.lwjgl.Sys;
+
 public class DLList {
     private DNode head;
     private DNode tail;
@@ -47,31 +49,55 @@ public class DLList {
         head.setNext(head.getNext().getNext());
         return popValue;
     }
-    private boolean isFirst()
-    public void delete(DNode tarNode){
-        if (tarNode.getPrev() == null && tarNode.getNext() != null) {
+    private boolean isFirst(DNode testNode){
+        return (testNode.getPrev() == null && testNode.getNext() != null);
+    }
 
+    private boolean isLast(DNode testNode){
+        return (testNode.getPrev() != null && testNode.getNext() == null);
+    }
+    public void delete(DNode tarNode){ //Target node
+        if(isFirst(tarNode))
+            head = tarNode;
+        if(tarNode.getNext() != null)
+            tarNode.getNext().setPrev(tarNode.getPrev());
+
+        if(isLast(tarNode))
+            tail = tarNode;
+        if(tarNode.getPrev() != null)
+            tarNode.getPrev().setNext(tarNode.getNext());
+
+        tarNode.setNext(null);
+        tarNode.setPrev(null);
+    }
+    public void delete(int tar){
+        DNode tmp = head;
+        while(tmp != null) {
+            tmp = tmp.getNext();
+            if (tmp.getVal() == tar)
+                break;
         }
+        if(tmp == null)
+            return;
+        delete(tmp);
+    }
 
-    public void delete(int n) {
+    public void deleteAt(int n) {
         DNode tmp = head;
         for (int i = 0; i < n; i++)
             tmp = tmp.getNext();
-        if (tmp.getPrev() == null && tmp.getNext() != null) {
-            tmp.getNext().setPrev(tmp.getPrev());
+        if(tmp == null)
+            return;
+
+        if (isFirst(tmp))
             head = tmp.getNext();
-        }
-        else if(tmp.getNext() == null && tmp.getPrev() != null) {
-            tmp.getPrev().setNext(tmp.getNext());
-            tail = tmp.getPrev();
-        }
-        else if (tmp.getPrev() != null && tmp.getNext() != null) {
-            tmp.getPrev().setNext(tmp.getNext());
+        else if (tmp.getNext() != null)
             tmp.getNext().setPrev(tmp.getPrev());
-        }
-//
-//        System.out.println(tmp);
-//        System.out.println(tmp.getNext());
+
+        if(isLast(tmp))
+            tail = tmp.getPrev();
+        else if (tmp.getPrev() != null)
+            tmp.getPrev().setNext(tmp.getNext());
 
         tmp.setPrev(null);
         tmp.setNext(null);
