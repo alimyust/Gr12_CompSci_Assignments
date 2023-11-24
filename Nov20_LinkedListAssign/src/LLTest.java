@@ -3,17 +3,23 @@ import java.util.LinkedList;
 public class LLTest {
     public static void main(String[] args) {
         LList myList=new LList();
-        for (int i = 0; i < 5; i++)
+        myList.reverse();
+        System.out.println(myList);
+        for (int i = 0; i < 7; i++)
             myList.push(i);
 //        myList.sortedInsert(new LNode(-3));
 //        myList.add(1);
         System.out.println(myList);
 //        myList.removeDuplicates();
 //        System.out.println(myList);
-        myList.reverse();
+//        myList.reverse();
         System.out.println(myList);
         System.out.println("End");
 
+        LList cloneList = myList.cloneList();
+        cloneList.push(2);
+//        cloneList.reverse();
+        System.out.println(cloneList);
 //        System.out.println(myList + "\n");
 
 //        DLList dList = new DLList();

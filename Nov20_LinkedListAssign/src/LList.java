@@ -19,7 +19,12 @@ public class LList {
         LNode tmp = new LNode(n, head);
         head = tmp;
     }
-
+    public int pop() {
+        int popValue = head.getVal();
+        head.setVal(head.getNext().getVal());
+        head.setNext(head.getNext().getNext());
+        return popValue;
+    }
     public void sortedInsert(LNode newNode) {
         LNode tmp = head;
         while (tmp.getVal() > newNode.getVal() && tmp.getNext() != null) {
@@ -36,6 +41,10 @@ public class LList {
     }
 
     public void removeDuplicates() {
+        if(head == null) {
+            System.out.println("Empty List");
+            return;
+        }
         LNode cur = head;
         Set<Integer> hashSet = new HashSet<>();
         int setLen;
@@ -58,6 +67,10 @@ public class LList {
     }
 
     public void reverse() {
+        if(head == null) {
+            System.out.println("Empty List");
+            return;
+        }
         LNode cur = head;
         ArrayList<LNode> nodeStack = new ArrayList<>();
         while (cur != null) {
@@ -67,41 +80,22 @@ public class LList {
         int ns = nodeStack.size() - 1;
         nodeStack.get(ns).setNext(nodeStack.get(ns - 1));
         head = nodeStack.get(ns);
-        nodeStack.get(ns - 1).setNext(nodeStack.get(ns - 2));
-        nodeStack.get(ns - 2).setNext(nodeStack.get(ns - 3));
-        nodeStack.get(ns - 3).setNext(nodeStack.get(ns - 4));
-        nodeStack.get(ns - 4).setNext(null);
         for (int i = ns -1; i > 0; i--)
             nodeStack.get(i).setNext(nodeStack.get(i-1));
         nodeStack.get(0).setNext(null);
-
-//        for (int i = nodeStack.size() - 2; i > 0; i--) {
-//            System.out.println(nodeStack.get(i));
-//            nodeStack.get(i).setNext(nodeStack.get(i - 1));
-//        }
     }
 
-    public void sortedRemoveDuplicates() {
+    public LList cloneList(){
         LNode cur = head;
-        LNode tmp = null;
-        while (cur.getNext() != null) {
-            if (cur.getVal() == cur.getNext().getVal() && tmp == null)
-                tmp = cur;
-            if (tmp != null)
-                tmp.setNext(cur.getNext());
-            if (cur.getVal() != cur.getNext().getVal())
-                tmp = null;
-            cur = cur.getNext();
+        LList outList = new LList();
+        while(cur != null){
+            LNode tmp = new LNode(cur.getVal());
+            outList.push(tmp.getVal());
+            cur =cur.getNext();
         }
+        outList.reverse();
+        return outList;
     }
-
-    public int pop() {
-        int popValue = head.getVal();
-        head.setVal(head.getNext().getVal());
-        head.setNext(head.getNext().getNext());
-        return popValue;
-    }
-
     public String toString() {
         LNode tmp = head;
         String ans = "";
