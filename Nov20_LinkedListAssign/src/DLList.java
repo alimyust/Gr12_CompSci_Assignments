@@ -1,18 +1,22 @@
 
 public class DLList {
-    private DNode head;
+    private static DNode head;
+
     private DNode tail;
 
-
     public DLList() {
-        head = null;
-        tail = null;
+        head = tail =  null;
     }
 
     public void add(int n) {
         DNode tmp = new DNode(n, head, tail);
+        tmp.setNext(head);
+        tmp.setPrev(null);
+        if (head != null)
+            head.setPrev(tmp);
+        if (tail == null)
+            tail = tmp;
         head = tmp;
-
     }
 
     public void push(int n) {
@@ -22,7 +26,7 @@ public class DLList {
         if (head != null)
             head.setPrev(tmp);
         if (tail == null)
-            tail = head;
+            tail = tmp;
         head = tmp;
     }
 
@@ -32,6 +36,8 @@ public class DLList {
         tmp.setPrev(tail);
         if (tail != null)
             tail.setNext(tmp);
+        if (head == null)
+            head = tmp;
         tail = tmp;
     }
 
@@ -43,19 +49,31 @@ public class DLList {
     }
 
     public int pop() {
+        if(head == null){
+            System.out.println("Empty List");
+            return -1;
+        }
         int popValue = head.getVal();
-        head.setVal(head.getNext().getVal());
-        head.setNext(head.getNext().getNext());
-        return popValue;
+        if(head.getNext() == null){
+            head =null;
+        }else {
+            head.setVal(head.getNext().getVal());
+            head.setNext(head.getNext().getNext());
+        }return popValue;
     }
+
     private boolean isFirst(DNode testNode){
         return (testNode.getPrev() == null && testNode.getNext() != null);
     }
-
     private boolean isLast(DNode testNode){
         return (testNode.getPrev() != null && testNode.getNext() == null);
     }
+
     public void delete(DNode tarNode){ //Target node
+        if(tarNode == null){
+            System.out.println("Invalid Input");
+            return;
+        }
         if(isFirst(tarNode))
             head = tarNode;
         if(tarNode.getNext() != null)
@@ -80,7 +98,6 @@ public class DLList {
             return;
         delete(tmp);
     }
-
     public void deleteAt(int n) {
         DNode tmp = head;
         for (int i = 0; i < n; i++)
@@ -100,6 +117,10 @@ public class DLList {
 
         tmp.setPrev(null);
         tmp.setNext(null);
+    }
+
+    public static DNode getHead() {
+        return head;
     }
 
     public String toString() {

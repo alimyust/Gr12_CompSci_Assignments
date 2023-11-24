@@ -41,16 +41,14 @@ public class LList {
     }
 
     public void removeDuplicates() {
-        if(head == null) {
-            System.out.println("Empty List");
-            return;
-        }
+        if(head == null || head.getNext() == null)
+            return; // returns if there are 0 or 1 elements in the list
+
         LNode cur = head;
         Set<Integer> hashSet = new HashSet<>();
         int setLen;
         int oldSetLen = 0;
         hashSet.add(cur.getVal());
-
         while (cur.getNext().getNext() != null) {
             setLen = hashSet.size();
             hashSet.add(cur.getNext().getNext().getVal());
@@ -67,10 +65,9 @@ public class LList {
     }
 
     public void reverse() {
-        if(head == null) {
-            System.out.println("Empty List");
-            return;
-        }
+        if(head == null || head.getNext() == null)
+            return; // returns if there are 0 or 1 elements in the list
+
         LNode cur = head;
         ArrayList<LNode> nodeStack = new ArrayList<>();
         while (cur != null) {
