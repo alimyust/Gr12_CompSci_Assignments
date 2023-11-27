@@ -5,104 +5,98 @@ public class DLList {
     private DNode tail;
 
     public DLList() {
-        head = tail =  null;
+        head = tail = null;
     }
 
     public void add(int n) {
-        DNode tmp = new DNode(n, head, tail);
-        tmp.setNext(head);
-        tmp.setPrev(null);
-        if (head != null)
+        DNode tmp = new DNode(n, head, null);
+        //creates a null pointing at head with nothing behind it
+        if (head != null) // if not empty then the previous of head is
             head.setPrev(tmp);
         if (tail == null)
-            tail = tmp;
+            tail = tmp; // if empty then tail is also head which is tmp
         head = tmp;
     }
 
     public void push(int n) {
-        DNode tmp = new DNode(n, head, tail);
-        tmp.setNext(head);
-        tmp.setPrev(null);
-        if (head != null)
-            head.setPrev(tmp);
-        if (tail == null)
-            tail = tmp;
-        head = tmp;
+        add(n);//same as add
     }
 
     public void enqueue(int n) {
-        DNode tmp = new DNode(n, head, tail);
-        tmp.setNext(null);
-        tmp.setPrev(tail);
-        if (tail != null)
+        DNode tmp = new DNode(n, null, tail);
+        // creates a new node that points at nothing forward and at the tail backward
+        if (tail != null) // if there is a tail make the tail point at tmp
             tail.setNext(tmp);
         if (head == null)
-            head = tmp;
+            head = tmp;//if empty then the head = tail = tmp
         tail = tmp;
     }
 
     public int dequeue() {
-        int popValue = head.getVal();
-        head.setVal(head.getNext().getVal());
-        head.setNext(head.getNext().getNext());
-        return popValue;
+        //same logic as pop. Records the head value and then sets the next head to the next next node, skipping
+        //only and removing it from the DLL.
+        return pop();
     }
 
     public int pop() {
-        if(head == null){
+        if (head == null) {
             System.out.println("Empty List");
             return -1;
         }
         int popValue = head.getVal();
-        if(head.getNext() == null){
-            head =null;
-        }else {
+        if (head.getNext() == null) {
+            head = null;
+        } else {
             head.setVal(head.getNext().getVal());
             head.setNext(head.getNext().getNext());
-        }return popValue;
+        }
+        return popValue;
     }
 
-    private boolean isFirst(DNode testNode){
+    private boolean isFirst(DNode testNode) {
         return (testNode.getPrev() == null && testNode.getNext() != null);
     }
-    private boolean isLast(DNode testNode){
+    //helper methods to check if a node is head / tail;
+    private boolean isLast(DNode testNode) {
         return (testNode.getPrev() != null && testNode.getNext() == null);
     }
 
-    public void delete(DNode tarNode){ //Target node
-        if(tarNode == null){
+    public void delete(DNode tarNode) { //Target node
+        if (tarNode == null) {
             System.out.println("Invalid Input");
             return;
         }
-        if(isFirst(tarNode))
+        if (isFirst(tarNode))
             head = tarNode;
-        if(tarNode.getNext() != null)
+        if (tarNode.getNext() != null)
             tarNode.getNext().setPrev(tarNode.getPrev());
 
-        if(isLast(tarNode))
+        if (isLast(tarNode))
             tail = tarNode;
-        if(tarNode.getPrev() != null)
+        if (tarNode.getPrev() != null)
             tarNode.getPrev().setNext(tarNode.getNext());
 
         tarNode.setNext(null);
         tarNode.setPrev(null);
     }
-    public void delete(int tar){
+
+    public void delete(int tar) {
         DNode tmp = head;
-        while(tmp != null) {
+        while (tmp != null) {
             tmp = tmp.getNext();
             if (tmp.getVal() == tar)
                 break;
         }
-        if(tmp == null)
+        if (tmp == null)
             return;
         delete(tmp);
     }
+
     public void deleteAt(int n) {
         DNode tmp = head;
         for (int i = 0; i < n; i++)
             tmp = tmp.getNext();
-        if(tmp == null)
+        if (tmp == null)
             return;
 
         if (isFirst(tmp))
@@ -110,7 +104,7 @@ public class DLList {
         else if (tmp.getNext() != null)
             tmp.getNext().setPrev(tmp.getPrev());
 
-        if(isLast(tmp))
+        if (isLast(tmp))
             tail = tmp.getPrev();
         else if (tmp.getPrev() != null)
             tmp.getPrev().setNext(tmp.getNext());

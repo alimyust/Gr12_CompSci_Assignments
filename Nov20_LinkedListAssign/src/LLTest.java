@@ -3,25 +3,29 @@ import java.util.LinkedList;
 public class LLTest {
     public static void main(String[] args) {
         LList myList=new LList();
-        for (int i = 0; i < 1; i++)
+        for (int i = 1; i < 6; i++)
             myList.push(i);
-        System.out.println(myList);
+        System.out.println("Base List\t\t\t:" +myList);
+        myList.sortedInsert(new LNode(3));
+        System.out.println("Sorted Insert\t\t:" + myList);
+        myList.removeDuplicates();
+        System.out.println("Removed Duplicates  :" + myList);
         myList.reverse();
-//        myList.removeDuplicates();
-        myList.sortedInsert(new LNode(1));
-        System.out.println(myList);
+        System.out.println("Reversed List   \t:" + myList);
+        LList clonedLL = myList.cloneList();
+        System.out.println("Cloned List \t\t:" + clonedLL);
+        int popVal =myList.pop();
+        System.out.println("Popped List\t\t\t:" + myList + "  Popped: "+popVal);
+        myList.push(55);
+        System.out.println("Pushed List\t\t\t:" + myList + "\n");
 
-//        DLList dList = new DLList();
-//        for (int i = 1; i < 2; i++)
-//            dList.push(i);
-//        System.out.println(dList);
-//        dList.pop();
-//        System.out.println(dList);
-//        dList.enqueue(1);
-//        System.out.println(dList);
-////        dList.enqueue(2);
-//        System.out.println(dList);
-//        System.out.println("End");
+        DLList dList = new DLList();
+        for (int i = 1; i < 4; i++)
+            dList.add(i);
+        System.out.println("Base List\t\t\t:"+ dList);
+        int dPop = dList.pop();
+        System.out.println("Popped List\t\t\t:"+ dList+ "  D_Popped: "+dPop);
 
+        System.out.println("End");
     }
 }

@@ -11,15 +11,18 @@ public class LList {
     }
 
     public void add(int n) {
-        LNode tmp = new LNode(n, head);
-        head = tmp;
+        head = new LNode(n, head);
     }
 
     public void push(int n) {
-        LNode tmp = new LNode(n, head);
-        head = tmp;
+        head = new LNode(n, head);
+        //creates a new node with the value that becomes the new head and points at the old head
     }
     public int pop() {
+        if(head == null) {
+            System.out.println("Empty List");
+            return -1;
+        }
         int popValue = head.getVal();
         head.setVal(head.getNext().getVal());
         head.setNext(head.getNext().getNext());
@@ -41,45 +44,49 @@ public class LList {
     }
 
     public void removeDuplicates() {
-        if(head == null || head.getNext() == null)
+        if(head == null || head.getNext() == null){
+            System.out.println("Not enough elements for any to occur more then once");
             return; // returns if there are 0 or 1 elements in the list
-
+        }
         LNode cur = head;
         Set<Integer> hashSet = new HashSet<>();
-        int setLen;
+        //Sets store unique elements so if you append all the elements, it won't include and duplicates
+        int setLen; // variables to keep track of the sets length ( amount of distinct elements)
         int oldSetLen = 0;
         hashSet.add(cur.getVal());
         while (cur.getNext().getNext() != null) {
             setLen = hashSet.size();
             hashSet.add(cur.getNext().getNext().getVal());
             // Check if the size changed after adding the next element
-            if (oldSetLen == setLen)
-                cur.setNext(cur.getNext().getNext());
-            oldSetLen = setLen;
+            if (oldSetLen == setLen) // if it didn't the added element was a repeat, so it didn't go into the set
+                cur.setNext(cur.getNext().getNext()); // sets the cur value to skip over the (attempted) added value
+            oldSetLen = setLen; // resets and the keeps cycling through the list
             cur = cur.getNext();
         }
         hashSet.add(cur.getNext().getVal());
+        //case to cover the last element
         if (hashSet.size() == oldSetLen)
             cur.setNext(null);
-//        System.out.println(cur);
     }
 
     public void reverse() {
-        if(head == null || head.getNext() == null)
+        if(head == null || head.getNext() == null) {
+            System.out.println("Empty List");
             return; // returns if there are 0 or 1 elements in the list
-
+        }
         LNode cur = head;
         ArrayList<LNode> nodeStack = new ArrayList<>();
+        //list to hold all the nodes
         while (cur != null) {
             nodeStack.add(cur);
             cur = cur.getNext();
-        }
+        } // adds all nodes to the list
         int ns = nodeStack.size() - 1;
-        nodeStack.get(ns).setNext(nodeStack.get(ns - 1));
-        head = nodeStack.get(ns);
-        for (int i = ns -1; i > 0; i--)
+        nodeStack.get(ns).setNext(nodeStack.get(ns - 1)); // sets next to the element before the tail
+        head = nodeStack.get(ns); // sets the new head with the old tail
+        for (int i = ns -1; i > 0; i--)//repeats this process for every element
             nodeStack.get(i).setNext(nodeStack.get(i-1));
-        nodeStack.get(0).setNext(null);
+        nodeStack.get(0).setNext(null); // sets the first element to null (old head becomes new tail)
     }
 
     public LList cloneList(){
@@ -87,10 +94,13 @@ public class LList {
         LList outList = new LList();
         while(cur != null){
             LNode tmp = new LNode(cur.getVal());
+            //creates a new node with a unique address and the same value
             outList.push(tmp.getVal());
+            //pushes it to the new clone LList
             cur =cur.getNext();
         }
         outList.reverse();
+        //since all values are pushed in the list needs to be reversed to be in the right order
         return outList;
     }
     public String toString() {
