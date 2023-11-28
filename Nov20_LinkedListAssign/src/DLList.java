@@ -1,3 +1,4 @@
+import org.lwjgl.Sys;
 
 public class DLList {
     private static DNode head;
@@ -45,11 +46,11 @@ public class DLList {
         }
         int popValue = head.getVal();
         if (head.getNext() == null) {
-            head = null;
+            head = null; // if the next value is null (1 item) then make head null
         } else {
-            head.setVal(head.getNext().getVal());
-            head.setNext(head.getNext().getNext());
-        }
+            head = head.getNext();
+            head.setPrev(null);
+        } // turns head into the element it points at
         return popValue;
     }
 
@@ -66,18 +67,26 @@ public class DLList {
             System.out.println("Invalid Input");
             return;
         }
-        if (isFirst(tarNode))
-            head = tarNode;
-        if (tarNode.getNext() != null)
+        //putting tarnode in the correct place and then removing all of its pointers
+        //to delete it. Making nothing point at it.
+        if (isFirst(tarNode)) {
+            head = tarNode.getNext(); // deletes tmp since it would be the old head
+            head.setPrev(null);
+        }
+        else if (tarNode.getNext() != null) {
             tarNode.getNext().setPrev(tarNode.getPrev());
-
-        if (isLast(tarNode))
-            tail = tarNode;
-        if (tarNode.getPrev() != null)
+        }
+        //goes around tmp so nothing points at it
+        if (isLast(tarNode)) {
+            tail = tarNode.getPrev();
+            tail.setNext(null);
+        } else if (tarNode.getPrev() != null) {
             tarNode.getPrev().setNext(tarNode.getNext());
-
-        tarNode.setNext(null);
+        }
         tarNode.setPrev(null);
+        tarNode.setNext(null);
+        //at the end removes all pointers from tarNode so it's deleted
+
     }
 
     public void delete(int tar) {
@@ -87,34 +96,28 @@ public class DLList {
             if (tmp.getVal() == tar)
                 break;
         }
+        //searches the list to find the first instance of tar and the corresponding node
+        //deletes that node.
         if (tmp == null)
-            return;
+            return; //if not found, then nothing happens
         delete(tmp);
     }
 
     public void deleteAt(int n) {
         DNode tmp = head;
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++) {
+            if (tmp == null) {
+                System.out.println("  Index out of bounds");
+                return;
+            }
             tmp = tmp.getNext();
-        if (tmp == null)
-            return;
-
-        if (isFirst(tmp))
-            head = tmp.getNext();
-        else if (tmp.getNext() != null)
-            tmp.getNext().setPrev(tmp.getPrev());
-
-        if (isLast(tmp))
-            tail = tmp.getPrev();
-        else if (tmp.getPrev() != null)
-            tmp.getPrev().setNext(tmp.getNext());
-
-        tmp.setPrev(null);
-        tmp.setNext(null);
+        }
+        //gets the node at the n value and deletes it
+        delete(tmp);
     }
 
     public static DNode getHead() {
-        return head;
+        return head; //used to test del method
     }
 
     public String toString() {
@@ -130,3 +133,17 @@ public class DLList {
         return "[" + ans + "]";
     }
 }
+
+
+
+//        if (isFirst(tarNode))
+//            head = tarNode;
+//        if (tarNode.getNext() != null)
+//            tarNode.getNext().setPrev(tarNode.getPrev());
+//        //node before and after tar point at each other around tar
+//        if (isLast(tarNode))
+//            tail = tarNode;
+//        if (tarNode.getPrev() != null)
+//            tarNode.getPrev().setNext(tarNode.getNext());
+//        tarNode.setNext(null);
+//        tarNode.setPrev(null);

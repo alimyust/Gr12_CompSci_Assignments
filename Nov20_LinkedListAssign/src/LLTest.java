@@ -20,12 +20,17 @@ public class LLTest {
         System.out.println("Pushed List\t\t\t:" + myList + "\n");
 
         DLList dList = new DLList();
-        for (int i = 1; i < 4; i++)
+        for (int i = 1; i < 5; i++)
             dList.add(i);
         System.out.println("Base List\t\t\t:"+ dList);
         int dPop = dList.pop();
         System.out.println("Popped List\t\t\t:"+ dList+ "  D_Popped: "+dPop);
-
+        dList.delete(DLList.getHead().getNext());
+        System.out.println("Deleted head+1\t\t:"+dList);
+        dList.deleteAt(1);
+        System.out.println("Deleted Index 1\t\t:"+dList);
+        int dqVal = dList.dequeue();
+        System.out.println("Dequeued List \t\t:"+ dList + "  DQ_Val: " + dqVal);
         System.out.println("End");
     }
 }
