@@ -1,4 +1,3 @@
-import org.lwjgl.Sys;
 
 public class DLList {
     private static DNode head;
@@ -57,6 +56,7 @@ public class DLList {
     private boolean isFirst(DNode testNode) {
         return (testNode.getPrev() == null && testNode.getNext() != null);
     }
+
     //helper methods to check if a node is head / tail;
     private boolean isLast(DNode testNode) {
         return (testNode.getPrev() != null && testNode.getNext() == null);
@@ -72,8 +72,7 @@ public class DLList {
         if (isFirst(tarNode)) {
             head = tarNode.getNext(); // deletes tmp since it would be the old head
             head.setPrev(null);
-        }
-        else if (tarNode.getNext() != null) {
+        } else if (tarNode.getNext() != null) {
             tarNode.getNext().setPrev(tarNode.getPrev());
         }
         //goes around tmp so nothing points at it
@@ -116,6 +115,45 @@ public class DLList {
         delete(tmp);
     }
 
+    public void removeDuplicates() {
+        DNode tO = head;
+        DNode tI;
+
+        while (tO != null) {
+            tI = tO;
+            while (tI != null) {
+                if (tI.getVal() == tO.getVal()) {
+                    if (tI.getNext() == null) {
+                        delete(tI);
+                        tO = head;
+                        break;
+                    }
+                    tI = tI.getNext();
+                    delete(tI.getPrev());
+                } else {
+                    tI = tI.getNext();
+                }
+            }
+            tO = tO.getNext();
+        }
+    }
+
+    public void reverse(){
+        DNode curr = head;
+        DNode nxt;
+        DNode prv;
+        while(curr != null){
+            nxt = curr.getNext();
+            prv = curr.getPrev();
+            curr.setNext(prv);
+            curr.setPrev(nxt);
+            if(nxt == null)
+                head = curr;
+            curr = nxt;
+        }
+
+    }
+
     public static DNode getHead() {
         return head; //used to test del method
     }
@@ -133,17 +171,3 @@ public class DLList {
         return "[" + ans + "]";
     }
 }
-
-
-
-//        if (isFirst(tarNode))
-//            head = tarNode;
-//        if (tarNode.getNext() != null)
-//            tarNode.getNext().setPrev(tarNode.getPrev());
-//        //node before and after tar point at each other around tar
-//        if (isLast(tarNode))
-//            tail = tarNode;
-//        if (tarNode.getPrev() != null)
-//            tarNode.getPrev().setNext(tarNode.getNext());
-//        tarNode.setNext(null);
-//        tarNode.setPrev(null);

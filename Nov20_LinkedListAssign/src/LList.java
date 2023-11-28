@@ -43,31 +43,46 @@ public class LList {
             head = newNode;
     }
 
-    public void removeDuplicates() {
-        if(head == null || head.getNext() == null){
-            System.out.println("Not enough elements for any to occur more then once");
-            return; // returns if there are 0 or 1 elements in the list
+    public void removeDuplicates(){
+        LNode tmp1 = head;
+        LNode tmp2 = head;
+        while(tmp1 != null){
+            tmp2 = tmp1;
+            while(tmp2.getNext() != null){
+                if(tmp2.getNext().getVal() == tmp1.getVal()) {
+                    tmp2.setNext(tmp2.getNext().getNext());
+                    tmp2.getNext().setNext(null);
+                }
+                tmp2 = tmp2.getNext();
+            }
+            tmp1 =tmp1.getNext();
         }
-        LNode cur = head;
-        Set<Integer> hashSet = new HashSet<>();
-        //Sets store unique elements so if you append all the elements, it won't include and duplicates
-        int setLen; // variables to keep track of the sets length ( amount of distinct elements)
-        int oldSetLen = 0;
-        hashSet.add(cur.getVal());
-        while (cur.getNext().getNext() != null) {
-            setLen = hashSet.size();
-            hashSet.add(cur.getNext().getNext().getVal());
-            // Check if the size changed after adding the next element
-            if (oldSetLen == setLen) // if it didn't the added element was a repeat, so it didn't go into the set
-                cur.setNext(cur.getNext().getNext()); // sets the cur value to skip over the (attempted) added value
-            oldSetLen = setLen; // resets and the keeps cycling through the list
-            cur = cur.getNext();
-        }
-        hashSet.add(cur.getNext().getVal());
-        //case to cover the last element
-        if (hashSet.size() == oldSetLen)
-            cur.setNext(null);
     }
+//    public void removeDuplicates() {
+//        if(head == null || head.getNext() == null){
+//            System.out.println("Not enough elements for any to occur more then once");
+//            return; // returns if there are 0 or 1 elements in the list
+//        }
+//        LNode cur = head;
+//        Set<Integer> hashSet = new HashSet<>();
+//        //Sets store unique elements so if you append all the elements, it won't include and duplicates
+//        int setLen; // variables to keep track of the sets length ( amount of distinct elements)
+//        int oldSetLen = 0;
+//        hashSet.add(cur.getVal());
+//        while (cur.getNext().getNext() != null) {
+//            setLen = hashSet.size();
+//            hashSet.add(cur.getNext().getNext().getVal());
+//            // Check if the size changed after adding the next element
+//            if (oldSetLen == setLen) // if it didn't the added element was a repeat, so it didn't go into the set
+//                cur.setNext(cur.getNext().getNext()); // sets the cur value to skip over the (attempted) added value
+//            oldSetLen = setLen; // resets and the keeps cycling through the list
+//            cur = cur.getNext();
+//        }
+//        hashSet.add(cur.getNext().getVal());
+//        //case to cover the last element
+//        if (hashSet.size() == oldSetLen)
+//            cur.setNext(null);
+//    }
 
     public void reverse() {
         if(head == null || head.getNext() == null) {
