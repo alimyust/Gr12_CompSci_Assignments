@@ -1,23 +1,37 @@
 public class BTree {
     private BNode root;
-
     public static final int PRE = 0;
     public static final int IN = 1;
     public static final int POST = 2;
-
     public BTree() {
         root = null;
     }
+
     public BNode getRoot() {
         return root;
     }
+
     public void add(int n) {
         BNode tmp = new BNode(n);
         if (root == null)
             root = tmp;
         else
             add(root, tmp);
+    }
+    public BNode search(int n){
+        BNode retNode = search(n, root);
+        return (n != root.getVal() && retNode == root)? null:retNode;
+    }
+    public int sumLeaves(){return sumLeaves(0, root);}
+    public int total(){return total(0,root);}
+    public int height(){return height(-1, root);}
+    public int depth(int n) {
+        int dep = depth(n, 0, root);
+        return (dep == 0 && root.getVal() != n) ? -1 : dep;
+    }
 
+    public void display(){
+        System.out.println(this);
     }
     private void add(BNode branch, BNode tmp) {
         if (tmp.getVal() > branch.getVal()) {
@@ -32,11 +46,6 @@ public class BTree {
                 add(branch.getLeft(), tmp);
         }
     }
-    public BNode search(int n){
-        BNode retNode = search(n, root);
-        return (n != root.getVal() && retNode == root)? null:retNode;
-//        return (root.getVal() != n) ? -1 : dep;
-    }
     private BNode search(int n, BNode branch){
         if(branch == null)
             return root;
@@ -46,14 +55,8 @@ public class BTree {
             return search(n, branch.getLeft());
         return branch;
     }
-    private boolean isLeaf(BNode tmp){
-        return(tmp.getLeft() == null && tmp.getRight() == null);
-    }
-    public int sumLeaves(){
-        return sumLeaves(0, root);
-    }
     private int sumLeaves(int sum, BNode branch){
-        if(isLeaf(branch))
+        if(branch.isLeaf())
             return branch.getVal();
         if(branch.getLeft() != null)
             sum += sumLeaves(sum, branch.getLeft());
@@ -61,8 +64,48 @@ public class BTree {
             sum += sumLeaves(sum, branch.getRight());
         return sum;
     }
-    public void display(){
-        System.out.println(this);
+    private int total(int sum, BNode branch){
+        if(branch == null)
+            return 0;
+        sum = total(sum, branch.getLeft()) + total(sum, branch.getRight());
+        return branch.getVal()+sum;
+    }
+    private int height(int hgt, BNode branch){
+        if(branch == null)
+            return hgt;
+        hgt =Math.max(height( hgt + 1, branch.getLeft()),
+                    height(hgt + 1, branch.getRight()));
+        return hgt;
+    }
+    public int depth(int n, int count, BNode branch) {
+        if (branch != null) {
+            if (n == branch.getVal())
+                return count;
+            return depth(n, count + 1, branch.getLeft()) + depth(n, count + 1, branch.getRight());
+        }
+        return 0;
+    }
+    public boolean isIdentical(BTree otherTree){
+        return (this).equals(otherTree);
+    }
+    public boolean isBalanced(){
+        return isBalanced( root, true);
+    }
+    private boolean isBalanced(BNode branch, boolean bal){
+        if(!bal)
+            return false;
+        if(branch == null)
+            return true;
+        bal = Math.abs(countNodes(branch.getLeft()) - countNodes(branch.getRight())) <= 1;
+        isBalanced(branch.getLeft(), bal);
+        isBalanced(branch.getRight(), bal);
+        return bal;
+    }
+
+    public int countNodes(BNode branch){
+        if(branch == null)
+            return 0;
+        return 1 + countNodes(branch.getLeft()) + countNodes(branch.getRight());
     }
     public void display(int type){
         String ans;
@@ -80,19 +123,6 @@ public class BTree {
             ans = ans.substring(0, ans.length() - 2);
         System.out.println("{" + ans + "}");
     }
-    public int depth(int n) {
-        int dep = depth(n, 0, root);
-        return (dep == 0 && root.getVal() != n) ? -1 : dep;
-    }
-    public int depth(int n, int count, BNode branch) {
-        if (branch != null) {
-            if (n == branch.getVal())
-                return count;
-            return depth(n, count + 1, branch.getLeft()) + depth(n, count + 1, branch.getRight());
-        }
-        return 0;
-    }
-
     private String preOrder(BNode branch) {
         if (branch != null)
             return branch.getVal() + ", " + preOrder(branch.getLeft()) + preOrder(branch.getRight());

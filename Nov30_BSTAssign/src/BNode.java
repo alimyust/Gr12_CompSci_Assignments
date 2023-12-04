@@ -33,6 +33,15 @@ public class BNode {
     public void setRight(BNode right) {
         this.right = right;
     }
+    public boolean hasLeft(){
+        return (left != null);
+    }
+    public boolean hasRight(){
+        return (right != null);
+    }
+    public boolean isLeaf(){
+        return(left == null && right == null);
+    }
     @Override
     public String toString() {
         String ans=""+this.val;
