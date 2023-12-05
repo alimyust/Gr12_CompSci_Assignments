@@ -74,7 +74,7 @@ public class BTree {
         if(branch == null)
             return hgt;
         hgt =Math.max(height( hgt + 1, branch.getLeft()),
-                    height(hgt + 1, branch.getRight()));
+                height(hgt + 1, branch.getRight()));
         return hgt;
     }
     public int depth(int n, int count, BNode branch) {
@@ -92,14 +92,13 @@ public class BTree {
         return isBalanced( root, true);
     }
     private boolean isBalanced(BNode branch, boolean bal){
-        if(!bal)
-            return false;
         if(branch == null)
-            return true;
+            return bal;
         bal = Math.abs(countNodes(branch.getLeft()) - countNodes(branch.getRight())) <= 1;
-        isBalanced(branch.getLeft(), bal);
-        isBalanced(branch.getRight(), bal);
-        return bal;
+        boolean a = isBalanced(branch.getLeft(), bal);
+        boolean b = isBalanced(branch.getRight(), bal);
+        System.out.println(branch+", " +a + ", " + b);
+        return a && b;
     }
 
     public int countNodes(BNode branch){
@@ -146,4 +145,3 @@ public class BTree {
         return "{" + ans + "}";
     }
 }
-
