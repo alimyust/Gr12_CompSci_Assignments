@@ -18,6 +18,24 @@ public class BTree {
         else
             add(root, tmp);
     }
+    public void addList(int[] valList){
+        for(int j: valList)
+            this.add(j);
+    }
+    public void add(BTree otherTree){
+        add(otherTree.getRoot());
+    }
+    private void add(BNode branch){
+        if(branch == null)
+            return;
+        add(root,branch);
+//        if(branch.hasLeft())
+//            add(root, branch.getLeft());
+//        if(branch.hasRight())
+//            add(root, branch.getRight());
+        add(branch.getLeft());
+        add(branch.getRight());
+    }
     public BNode search(int n){
         BNode retNode = search(n, root);
         return (n != root.getVal() && retNode == root)? null:retNode;
