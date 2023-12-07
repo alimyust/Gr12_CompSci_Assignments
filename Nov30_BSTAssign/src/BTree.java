@@ -75,7 +75,7 @@ public class BTree {
     private int sumLeaves(int sum, BNode branch) {
         if (branch.isLeaf()) // if a node is a leaf then return that value
             return branch.getVal();
-        if (branch.getLeft() != null)//if left is avalible recurs left, and if it's a leaf it adds its value
+        if (branch.getLeft() != null)//if left is available recurs left, and if it's a leaf it adds its value
             sum += sumLeaves(sum, branch.getLeft());
         if (branch.getRight() != null)
             sum += sumLeaves(sum, branch.getRight());
@@ -101,9 +101,11 @@ public class BTree {
 
     private int total(int sum, BNode branch) {
         if (branch == null)
-            return 0;
+            return 0; // null values don't contribute to the sum, so return 0
         sum = total(sum, branch.getLeft()) + total(sum, branch.getRight());
+        // adds the total value of the left and right branches
         return branch.getVal() + sum;
+        // after all the recursions returns the sum + the value
     }
 
     public int depth(int n) {
@@ -112,16 +114,27 @@ public class BTree {
     }
 
     public int depth(int n, int count, BNode branch) {
-        if (branch != null) {
-            if (n == branch.getVal())
-                return count;
-            return depth(n, count + 1, branch.getLeft()) + depth(n, count + 1, branch.getRight());
-        }
-        return 0;
+        if(branch == null)
+            return 0; // looks for the n value. if it's not found the method will recur until it hits a leaf
+        if (n == branch.getVal()) // and that would make that entire path = 0
+            return count; // when the correct branch is found return the count to get there
+        return depth(n, count + 1, branch.getLeft()) + depth(n, count + 1, branch.getRight());
+    }     // keep returning the sum of the left and right. When found in one branch the other would = 0.
+
+//    public boolean isIdentical(BTree otherTree) {
+//        return (this).equals(otherTree);
+//    }
+    public boolean isIdentical(BTree otherTree) {
+    return isIdentical(root, otherTree.getRoot(), true);
     }
 
-    public boolean isIdentical(BTree otherTree) {
-        return (this).equals(otherTree);
+    private boolean isIdentical(BNode branchA, BNode branchB, boolean identical) {
+        if(branchA == null || branchB == null)
+            return identical;
+        if(branchA.getVal() != branchB.getVal())
+            identical = false;
+        return isIdentical(branchA.getLeft(), branchB.getLeft(), identical) &&
+                isIdentical(branchA.getRight(), branchB.getRight(), identical);
     }
 
     public boolean isBalanced() {
@@ -129,18 +142,19 @@ public class BTree {
     }
 
     private boolean isBalanced(BNode branch, boolean bal) {
+        //using a helper method "countNodes" to count between the left and right to determine the difference
         if (branch == null)
-            return bal;
+            return bal;//if leaf then just send the bal value of that branch
         bal = Math.abs(countNodes(branch.getLeft()) - countNodes(branch.getRight())) <= 1;
-        boolean a = isBalanced(branch.getLeft(), bal);
-        boolean b = isBalanced(branch.getRight(), bal);
-        System.out.println(branch + ", " + a + ", " + b);
-        return a && b;
-    }
+        //if the difference is greater than 1 it becomes false, otherwise true.
+        return isBalanced(branch.getLeft(), bal) && isBalanced(branch.getRight(), bal);
+        //if either side is false (not balanced) then the tree isn't either. so only returns true
+    } //if every node of the tree is balanced (true && false is still false)
 
     public int countNodes(BNode branch) {
-        if (branch == null)
-            return 0;
+        if (branch == null)//sums the amount of nodes between a certain node
+            return 0; // if it reaches null returns a 0
+        //adds 1 to the left node and right nodes (for every recursion it adds 1 to each branch split)
         return 1 + countNodes(branch.getLeft()) + countNodes(branch.getRight());
     }
 
@@ -150,6 +164,7 @@ public class BTree {
 
     public void display(int type) {
         String ans;
+        //switch statement to determine which order type is needed
         switch (type) {
             case PRE -> ans = preOrder(root);
             case POST -> ans = postOrder(root);
@@ -165,19 +180,19 @@ public class BTree {
     }
 
     private String preOrder(BNode branch) {
-        if (branch != null)
+        if (branch != null) //DLR
             return branch.getVal() + ", " + preOrder(branch.getLeft()) + preOrder(branch.getRight());
-        return "";
+        return ""; // different arrangements of Data, Left, Right to make
     }
 
     private String inOrder(BNode branch) {
-        if (branch != null)
+        if (branch != null) // LDR
             return inOrder(branch.getLeft()) + branch.getVal() + ", " + inOrder(branch.getRight());
         return "";
     }
 
     private String postOrder(BNode branch) {
-        if (branch != null)
+        if (branch != null) // LRD
             return postOrder(branch.getLeft()) + postOrder(branch.getRight()) + branch.getVal() + ", ";
         return "";
     }
