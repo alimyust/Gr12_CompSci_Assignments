@@ -73,13 +73,12 @@ public class BTree {
     }//overloaded with another method that recurs
 
     private int sumLeaves(int sum, BNode branch) {
+        if (branch == null)
+            return 0;
         if (branch.isLeaf()) // if a node is a leaf then return that value
             return branch.getVal();
-        if (branch.getLeft() != null)//if left is available recurs left, and if it's a leaf it adds its value
-            sum += sumLeaves(sum, branch.getLeft());
-        if (branch.getRight() != null)
-            sum += sumLeaves(sum, branch.getRight());
-        return sum;//after all the recursions the sum should have gone to every leaf
+//if left is available recurs left, and if it's a leaf it adds its value
+        return sumLeaves(sum, branch.getLeft()) + sumLeaves(sum, branch.getRight());//after all the recursions the sum should have gone to every leaf
     }
 
     public int height() {
@@ -125,16 +124,17 @@ public class BTree {
 //        return (this).equals(otherTree);
 //    }
     public boolean isIdentical(BTree otherTree) {
-    return isIdentical(root, otherTree.getRoot(), true);
+        return isIdentical(root, otherTree.getRoot());
     }
 
-    private boolean isIdentical(BNode branchA, BNode branchB, boolean identical) {
+    private boolean isIdentical(BNode branchA, BNode branchB) {
+        if(branchA == null && branchB== null)
+            return true; // if both are null return true (have same depth)
         if(branchA == null || branchB == null)
-            return identical;
-        if(branchA.getVal() != branchB.getVal())
-            identical = false;
-        return isIdentical(branchA.getLeft(), branchB.getLeft(), identical) &&
-                isIdentical(branchA.getRight(), branchB.getRight(), identical);
+            return false; // acts as XOR since and case was already covered
+        return  branchA.getVal() == branchB.getVal() && //if cur branches are equal and
+                isIdentical(branchA.getLeft(), branchB.getLeft()) && // left ones equal and
+                isIdentical(branchA.getRight(), branchB.getRight());//right ones equal return true
     }
 
     public boolean isBalanced() {
