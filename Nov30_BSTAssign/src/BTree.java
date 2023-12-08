@@ -138,16 +138,22 @@ public class BTree {
     }
 
     public boolean isBalanced() {
-        return isBalanced(root, true);
+        return isBalancedWid(root);
     }
 
-    private boolean isBalanced(BNode branch, boolean bal) {
+    private boolean isBalancedHgt(BNode branch){
+        if(branch == null)
+            return true; // using height
+        return Math.abs(height(-1, branch.getLeft()) - height(-1,branch.getRight())) <= 1 &&
+                isBalancedWid(branch.getLeft()) && isBalancedWid(branch.getRight());
+    }
+    private boolean isBalancedWid(BNode branch) {
         //using a helper method "countNodes" to count between the left and right to determine the difference
         if (branch == null)
-            return bal;//if leaf then just send the bal value of that branch
-        bal = Math.abs(countNodes(branch.getLeft()) - countNodes(branch.getRight())) <= 1;
+            return true;//if leaf then just send the bal value of that branch
         //if the difference is greater than 1 it becomes false, otherwise true.
-        return isBalanced(branch.getLeft(), bal) && isBalanced(branch.getRight(), bal);
+        return Math.abs(countNodes(branch.getLeft()) - countNodes(branch.getRight())) <= 1 &&
+                isBalancedWid(branch.getLeft()) && isBalancedWid(branch.getRight());
         //if either side is false (not balanced) then the tree isn't either. so only returns true
     } //if every node of the tree is balanced (true && false is still false)
 

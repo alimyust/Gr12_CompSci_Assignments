@@ -2,8 +2,8 @@ public class BTreeTester {
     public static void main(String[] args) {
         BTree BT = new BTree();
         BTree BT2 = new BTree();
-        BT.addList(new int[]{3, 1, 2, 0, 5, 6});
-        BT2.addList(new int[]{3, 2, 0, 5, 6,1});
+        BT.addList(new int[]{8, 4,7, 2, 9});
+        BT2.addList(new int[]{6,3,4,2,8,9});
         BT.display();
         System.out.println("Depth of 0:      " + BT.depth(0));
         System.out.println("Invalid depth:   " + BT.depth(-24));
